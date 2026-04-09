@@ -9,17 +9,44 @@ class World:
 
 
     def place_map(self, x_player, y_player):
-        u = x_player - self.width / 2
-        v = y_player - self.height / 2
+        u = x_player - self.width // 2
+        v = y_player - self.height // 2
         x, y = 0, 0
         pyxel.bltm(x, y, self.tm, u, v, self.width, self.height)
         
-    def deplace(self, player, speed = 1):
+    def deplace(self, app, speed = 1):
+        dx, dy = 0, 0
+
         if pyxel.btn(pyxel.KEY_RIGHT):
-            player.x_center += speed
+            dx += speed
         if pyxel.btn(pyxel.KEY_LEFT):
-            player.x_center -= speed
+            dx -= speed
         if pyxel.btn(pyxel.KEY_UP):
-            player.y_center -= speed
+            dy -= speed
         if pyxel.btn(pyxel.KEY_DOWN):
-            player.y_center += speed
+            dy += speed
+
+        app.player_x += dx
+        app.player_y += dy
+        app.x_center += dx
+        app.y_center += dy
+
+    def recentrer(self, app, speed = 5):
+        if not app.recentrer:
+            return
+
+        diff_x = app.player_x - app.x_center
+        diff_y = app.player_y - app.y_center
+
+        if abs(diff_x) <= speed:
+            app.x_center = app.player_x
+        else:
+            app.x_center += speed if diff_x > 0 else -speed
+
+        if abs(diff_y) <= speed:
+            app.y_center = app.player_y
+        else:
+            app.y_center += speed if diff_y > 0 else -speed
+
+        if app.x_center == app.player_x and app.y_center == app.player_y:
+            app.recentrer = False
