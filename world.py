@@ -26,8 +26,8 @@ class World:
         if pyxel.btn(pyxel.KEY_DOWN):
             dy += speed
 
-        app.player_x += dx
-        app.player_y += dy
+        app.player_x_abs += dx
+        app.player_y_abs += dy
         app.x_center += dx
         app.y_center += dy
 
@@ -35,18 +35,18 @@ class World:
         if not app.recentrer:
             return
 
-        diff_x = app.player_x - app.x_center
-        diff_y = app.player_y - app.y_center
+        diff_x = app.player_x_abs - app.x_center
+        diff_y = app.player_y_abs - app.y_center
 
         if abs(diff_x) <= speed:
-            app.x_center = app.player_x
+            app.x_center = app.player_x_abs
         else:
             app.x_center += speed if diff_x > 0 else -speed
 
         if abs(diff_y) <= speed:
-            app.y_center = app.player_y
+            app.y_center = app.player_y_abs
         else:
             app.y_center += speed if diff_y > 0 else -speed
 
-        if app.x_center == app.player_x and app.y_center == app.player_y:
+        if app.x_center == app.player_x_abs and app.y_center == app.player_y_abs:
             app.recentrer = False
