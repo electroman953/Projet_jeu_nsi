@@ -4,13 +4,13 @@ class Player:
 
     def __init__(self):
         self.speed = 5
-        self.width = 32
+        self.width = 2
         self.height = 32
 
     def deplace(self, app):
         #coordonnées du joueur relatif à l'écran
-        xp_r = app.screen_center_x + (app.player_x_abs - app.x_center) - 16
-        yp_r = app.screen_center_y + (app.player_y_abs - app.y_center) - 16
+        xp_r = app.screen_center_x + (app.player_x_abs - app.x_center) - self.width//2
+        yp_r = app.screen_center_y + (app.player_y_abs - app.y_center) - self.height//2
         if pyxel.btn(pyxel.KEY_UP) and yp_r >= 0:
             for i in range(self.speed):
                 if not self.next_dest_is_obstacle(app, 0, -1):
