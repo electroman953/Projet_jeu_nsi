@@ -50,3 +50,4 @@ class World:
 
         if app.x_center == app.player_x_abs and app.y_center == app.player_y_abs:
             app.recentrer = False
+    

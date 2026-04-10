@@ -54,3 +54,4 @@ class App:
                 
                 if pyxel.tilemap(self.world.tm).pget(x // 8, y // 8) in self.elt_col: #verifie si c'est un obstacle
                     self.obstacle.append((x//8, y//8))
+    
