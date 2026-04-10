@@ -27,3 +27,5 @@ class Player:
             else:
                 app.timestop = False
                 app.recentrer = True
+        if pyxel.btnp(pyxel.KEY_R):
+            print(app.obstacle)
