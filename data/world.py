@@ -14,23 +14,38 @@ class World:
         x, y = 0, 0
         pyxel.bltm(x, y, self.tm, u, v, self.width, self.height)
         
-    def deplace(self, app, speed = 1):
+    def deplace(self, app, speed=1):
         dx, dy = 0, 0
 
         if pyxel.btn(pyxel.KEY_RIGHT):
-            dx += speed
+            for _ in range(speed):
+                if not app.player.next_dest_is_obstacle(app, dx + 1, dy):
+                    dx += 1
+                else:
+                    break
         if pyxel.btn(pyxel.KEY_LEFT):
-            dx -= speed
+            for _ in range(speed):
+                if not app.player.next_dest_is_obstacle(app, dx - 1, dy):
+                    dx -= 1
+                else:
+                    break
         if pyxel.btn(pyxel.KEY_UP):
-            dy -= speed
+            for _ in range(speed):
+                if not app.player.next_dest_is_obstacle(app, dx, dy - 1):
+                    dy -= 1
+                else:
+                    break
         if pyxel.btn(pyxel.KEY_DOWN):
-            dy += speed
+            for _ in range(speed):
+                if not app.player.next_dest_is_obstacle(app, dx, dy + 1):
+                    dy += 1
+                else:
+                    break
 
         app.player_x_abs += dx
         app.player_y_abs += dy
         app.x_center += dx
         app.y_center += dy
-
     def recentrer(self, app, speed = 5):
         if not app.recentrer:
             return

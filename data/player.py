@@ -3,7 +3,7 @@ import pyxel
 class Player:
 
     def __init__(self):
-        self.speed = 2
+        self.speed = 5
         self.width = 32
         self.height = 32
 
@@ -11,18 +11,30 @@ class Player:
         #coordonnées du joueur relatif à l'écran
         xp_r = app.screen_center_x + (app.player_x_abs - app.x_center) - 16
         yp_r = app.screen_center_y + (app.player_y_abs - app.y_center) - 16
-        if pyxel.btn(pyxel.KEY_UP) and yp_r>=0:
-            if not self.next_dest_is_obstacle(app, 0, -self.speed):
-                app.player_y_abs -= self.speed
+        if pyxel.btn(pyxel.KEY_UP) and yp_r >= 0:
+            for i in range(self.speed):
+                if not self.next_dest_is_obstacle(app, 0, -1):
+                    app.player_y_abs -= 1
+                else:
+                    break
         if pyxel.btn(pyxel.KEY_DOWN) and yp_r<=app.height-self.height:
-            if not self.next_dest_is_obstacle(app, 0, self.speed):
-                app.player_y_abs += self.speed
+            for i in range(self.speed):
+                if not self.next_dest_is_obstacle(app, 0, 1):
+                    app.player_y_abs += 1
+                else:
+                    break
         if pyxel.btn(pyxel.KEY_LEFT) and xp_r>=0:
-            if not self.next_dest_is_obstacle(app, -self.speed, 0):
-                app.player_x_abs -= self.speed
+            for i in range(self.speed):
+                if not self.next_dest_is_obstacle(app, -1, 0):
+                    app.player_x_abs -= 1
+                else:
+                    break
         if pyxel.btn(pyxel.KEY_RIGHT) and xp_r<=app.width-self.width: 
-            if not self.next_dest_is_obstacle(app, self.speed, 0):
-                app.player_x_abs += self.speed
+            for i in range(self.speed):
+                if not self.next_dest_is_obstacle(app, 1, 0):
+                    app.player_x_abs += 1
+                else:
+                    break
 
     def check_key(self, app):
         if pyxel.btnp(pyxel.KEY_SPACE):
