@@ -18,24 +18,28 @@ class World:
         dx, dy = 0, 0
 
         if pyxel.btn(pyxel.KEY_RIGHT):
+            app.player.direction = "right"
             for _ in range(speed):
                 if not app.player.next_dest_is_obstacle(app, dx + 1, dy):
                     dx += 1
                 else:
                     break
         if pyxel.btn(pyxel.KEY_LEFT):
+            app.player.direction = "left"
             for _ in range(speed):
                 if not app.player.next_dest_is_obstacle(app, dx - 1, dy):
                     dx -= 1
                 else:
                     break
         if pyxel.btn(pyxel.KEY_UP):
+            app.player.direction = "up"
             for _ in range(speed):
                 if not app.player.next_dest_is_obstacle(app, dx, dy - 1):
                     dy -= 1
                 else:
                     break
         if pyxel.btn(pyxel.KEY_DOWN):
+            app.player.direction = "down"
             for _ in range(speed):
                 if not app.player.next_dest_is_obstacle(app, dx, dy + 1):
                     dy += 1
@@ -46,6 +50,7 @@ class World:
         app.player_y_abs += dy
         app.x_center += dx
         app.y_center += dy
+
     def recentrer(self, app, speed = 5):
         if not app.recentrer:
             return

@@ -42,9 +42,7 @@ class App:
     def draw(self):
         pyxel.cls(0)
         self.world.place_map(self.x_center, self.y_center)
-        player_screen_x = self.screen_center_x + (self.player_x_abs - self.x_center) - self.player.width//2
-        player_screen_y = self.screen_center_y + (self.player_y_abs - self.y_center) - self.player.height//2
-        pyxel.rect(player_screen_x, player_screen_y, self.player.width, self.player.height, 9)
+        self.player.draw(self)
 
     def load_walls(self):
         self.obstacle = []
