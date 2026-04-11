@@ -13,7 +13,20 @@ class App:
         self.screen_center_x = self.width // 2
         self.screen_center_y = self.height // 2
 
+        self.palette_normal = [
+            0x0D0D0D, 0x1D2B53, 0x7E2553, 0x008751,
+            0xAB5236, 0x1E8C0A, 0xC2C3C7, 0xFFF1E8,  
+            0xFF004D, 0xFFA300, 0xFFEC27, 0x00E436,
+            0x3DDB1A, 0x83769C, 0xFF77A8, 0xFFCCAA   
+        ]
 
+
+        self.palette_timestop = [
+            0x0D0D0D, 0x1D2B53, 0x7E2553, 0x008751,
+            0xAB5236, 0x555555, 0xC2C3C7, 0xFFF1E8,  
+            0xFF004D, 0xFFA300, 0xFFEC27, 0x00E436,
+            0xAAAAAA, 0x83769C, 0xFF77A8, 0xFFCCAA   
+        ]      
         self.x_center, self.y_center = self.screen_center_x, self.screen_center_y
 
 
@@ -24,7 +37,7 @@ class App:
         self.recentrer = False
         pyxel.init(self.width, self.height, title = "Jeu du héros", fps=60)
         pyxel.load('../Textures/res.pyxres')
-        
+        print(pyxel.VERSION)
         pyxel.run(self.update, self.draw)
 
     def update(self):
@@ -41,8 +54,13 @@ class App:
             
     def draw(self):
         pyxel.cls(0)
-        self.world.place_map(self.x_center, self.y_center)
+            
+        self.world.place_map(self.x_center, self.y_center, self)
         self.player.draw(self)
+        if self.timestop:
+            pyxel.colors[:] = self.palette_timestop
+        else:
+            pyxel.colors[:] = self.palette_normal    
 
     def load_walls(self):
         self.obstacle = []

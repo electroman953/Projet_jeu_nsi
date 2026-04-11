@@ -8,14 +8,12 @@ class World:
         self.tm = tm
         self.word_width = 2048
         self.word_height = 2048
+    def place_map(self, x_player, y_player, app):
 
-
-    def place_map(self, x_player, y_player):
         u = x_player - self.width // 2
         v = y_player - self.height // 2
-        x, y = 0, 0
-        pyxel.bltm(x, y, self.tm, u, v, self.width, self.height)
-        
+        pyxel.bltm(0, 0, self.tm, u, v, self.width, self.height)
+
     def deplace(self, app, speed=1):
         dx, dy = 0, 0
 
@@ -57,18 +55,21 @@ class World:
         if not app.recentrer:
             return
 
-        diff_x = app.player_x_abs - app.x_center
-        diff_y = app.player_y_abs - app.y_center
+        target_x = max(app.width // 2, min(app.player_x_abs, self.word_width - app.width // 2))
+        target_y = max(app.height // 2, min(app.player_y_abs, self.word_height - app.height // 2))
+
+        diff_x = target_x - app.x_center
+        diff_y = target_y - app.y_center
 
         if abs(diff_x) <= speed:
-            app.x_center = app.player_x_abs
+            app.x_center = target_x
         else:
             app.x_center += speed if diff_x > 0 else -speed
 
         if abs(diff_y) <= speed:
-            app.y_center = app.player_y_abs
+            app.y_center = target_y
         else:
             app.y_center += speed if diff_y > 0 else -speed
 
-        if app.x_center == app.player_x_abs and app.y_center == app.player_y_abs:
+        if app.x_center == target_x and app.y_center == target_y:
             app.recentrer = False

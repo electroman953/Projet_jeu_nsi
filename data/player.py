@@ -66,6 +66,12 @@ class Player:
     
     def draw(self, app):
         #coordonnées du joueur relatif à l'écran
+        pyxel.colors[:] = [
+            0x0D0D0D, 0x1D2B53, 0x7E2553, 0x008751,
+            0xAB5236, 0x5F574F, 0xC2C3C7, 0xFFF1E8,
+            0xFF004D, 0xFFA300, 0xFFEC27, 0x00E436,
+            0x29ADFF, 0x83769C, 0xFF77A8, 0xFFCCAA
+        ]
         player_screen_x = app.screen_center_x + (app.player_x_abs - app.x_center) - self.width//2
         player_screen_y = app.screen_center_y + (app.player_y_abs - app.y_center) - self.height//2
         animation_frame = (pyxel.frame_count // 10) % 8
