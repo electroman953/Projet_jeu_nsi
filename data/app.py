@@ -33,7 +33,7 @@ class App:
         
         self.player = Player()
         self.player_x_abs,self.player_y_abs = self.x_center, self.y_center
-        self.world = World(self.width, self.height,1)
+        self.world = World(self.width, self.height,2)
         self.recentrer = False
         pyxel.init(self.width, self.height, title = "Jeu du héros", fps=60)
         pyxel.load('../Textures/res.pyxres')
@@ -68,6 +68,6 @@ class App:
         for x in range(self.x_center - self.width//2, self.x_center + self.width//2, 8):
             for y in range(self.y_center - self.height//2, self.y_center + self.height//2, 8):                
                 
-                if pyxel.tilemap(self.world.tm).pget(x // 8, y // 8) in self.elt_col: #verifie si c'est un obstacle
+                if pyxel.tilemaps[self.world.tm].pget(x // 8, y // 8) in self.elt_col:
                     self.obstacle.append((x//8, y//8))
     
