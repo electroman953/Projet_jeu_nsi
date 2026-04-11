@@ -4,8 +4,8 @@ class Player:
 
     def __init__(self):
         self.speed = 5
-        self.width = 2
-        self.height = 32
+        self.width = 19
+        self.height = 34
         self.direction = "down"
 
     def deplace(self, app):

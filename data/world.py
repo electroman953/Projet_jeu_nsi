@@ -6,6 +6,8 @@ class World:
         self.width = width
         self.height = height
         self.tm = tm
+        self.word_width = 2048
+        self.word_height = 2048
 
 
     def place_map(self, x_player, y_player):
@@ -46,10 +48,10 @@ class World:
                 else:
                     break
 
-        app.player_x_abs += dx
-        app.player_y_abs += dy
-        app.x_center += dx
-        app.y_center += dy
+        app.player_x_abs = max(app.player.width // 2, min(app.player_x_abs + dx, self.word_width - app.player.width // 2))
+        app.player_y_abs = max(app.player.height // 2, min(app.player_y_abs + dy, self.word_height - app.player.height // 2))
+        app.x_center = max(app.width // 2, min(app.player_x_abs, self.word_width - app.width // 2))
+        app.y_center = max(app.height // 2, min(app.player_y_abs, self.word_height - app.height // 2))
 
     def recentrer(self, app, speed = 5):
         if not app.recentrer:
@@ -70,4 +72,3 @@ class World:
 
         if app.x_center == app.player_x_abs and app.y_center == app.player_y_abs:
             app.recentrer = False
-    
