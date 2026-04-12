@@ -1,7 +1,4 @@
 import pyxel
-from Textures.Perso.idle_up import idle_up
-from Textures.Perso.idle_left import idle_left
-from Textures.Perso.idle_right import idle_right
 from Textures.Perso.run_down import run_down
 
 class Player:
@@ -79,23 +76,27 @@ class Player:
         player_screen_x = app.screen_center_x + (app.player_x_abs - app.x_center) - self.width//2
         player_screen_y = app.screen_center_y + (app.player_y_abs - app.y_center) - self.height//2
         animation_frame = (pyxel.frame_count // 10) % 8
+        if self.run:
+            pass
+        else:
+            pyxel.image(0).load(0, 0, "../Textures/Perso/idle.png")
         if self.direction == "up":
             if self.run:
                 pass
             else:
-                idle_up(player_screen_x, player_screen_y, animation_frame)
+                pyxel.blt(player_screen_x, player_screen_y, 0, 24 * animation_frame, 120, 23, 39, 3)
         elif self.direction == "down":
             if self.run:
                 run_down(player_screen_x, player_screen_y, animation_frame)
             else:
-                pyxel.blt(player_screen_x, player_screen_y, 0, 24 * animation_frame, 0, 23, 39, 11)
+                pyxel.blt(player_screen_x, player_screen_y, 0, 24 * animation_frame, 0, 23, 39, 3)
         elif self.direction == "left":
             if self.run:
                 pass
             else:
-                idle_left(player_screen_x, player_screen_y, animation_frame)
+                pyxel.blt(player_screen_x, player_screen_y, 0, 24 * animation_frame, 40, 23, 39, 3)
         elif self.direction == "right":
             if self.run:
                 pass
             else:
-                idle_right(player_screen_x, player_screen_y, animation_frame)
+                pyxel.blt(player_screen_x, player_screen_y, 0, 24 * animation_frame, 80, 23, 39, 3)
