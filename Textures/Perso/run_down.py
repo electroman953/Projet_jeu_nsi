@@ -1,7 +1,22 @@
 import pyxel
 
-def run_down(x_offset, y_offset, animation_frame):
-    {0: Run_down0(x_offset, y_offset), 1: Run_down1(x_offset, y_offset), 2: Run_down2(x_offset, y_offset), 3: Run_down3(x_offset, y_offset), 4: Run_down4(x_offset, y_offset), 5: Run_down5(x_offset, y_offset), 6: Run_down6(x_offset, y_offset), 7: Run_down7(x_offset, y_offset)}[animation_frame]
+def run_down(x_offset, y_offset, anim_frame):
+    if anim_frame == 0:
+        Run_down0(x_offset, y_offset)
+    elif anim_frame == 1:
+        Run_down1(x_offset, y_offset)
+    elif anim_frame == 2:
+        Run_down2(x_offset, y_offset)
+    elif anim_frame == 3:
+        Run_down3(x_offset, y_offset)
+    elif anim_frame == 4:
+        Run_down4(x_offset, y_offset)
+    elif anim_frame == 5:
+        Run_down5(x_offset, y_offset)
+    elif anim_frame == 6:
+        Run_down6(x_offset, y_offset)
+    elif anim_frame == 7:
+        Run_down7(x_offset, y_offset)
 
 def Run_down0(x_offset, y_offset):
     pyxel.pset(9 + x_offset, 2 + y_offset, 1)
