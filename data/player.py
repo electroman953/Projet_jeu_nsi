@@ -2,6 +2,7 @@ import pyxel
 from Textures.Perso.idle_up import idle_up
 from Textures.Perso.idle_left import idle_left
 from Textures.Perso.idle_right import idle_right
+from Textures.Perso.run_down import run_down
 
 class Player:
 
@@ -10,13 +11,16 @@ class Player:
         self.width = 19
         self.height = 34
         self.direction = "down"
+        self.run = False
 
     def deplace(self, app):
         #coordonnées du joueur relatif à l'écran
         xp_r = app.screen_center_x + (app.player_x_abs - app.x_center) - self.width//2
         yp_r = app.screen_center_y + (app.player_y_abs - app.y_center) - self.height//2
+        self.run = False
         if pyxel.btn(pyxel.KEY_UP) and yp_r >= 0:
             self.direction = "up"
+            self.run = True
             for i in range(self.speed):
                 if not self.next_dest_is_obstacle(app, 0, -1):
                     app.player_y_abs -= 1
@@ -24,6 +28,7 @@ class Player:
                     break
         if pyxel.btn(pyxel.KEY_DOWN) and yp_r<=app.height-self.height:
             self.direction = "down"
+            self.run = True
             for i in range(self.speed):
                 if not self.next_dest_is_obstacle(app, 0, 1):
                     app.player_y_abs += 1
@@ -31,13 +36,15 @@ class Player:
                     break
         if pyxel.btn(pyxel.KEY_LEFT) and xp_r>=0:
             self.direction = "left"
+            self.run = True
             for i in range(self.speed):
                 if not self.next_dest_is_obstacle(app, -1, 0):
                     app.player_x_abs -= 1
                 else:
                     break
-        if pyxel.btn(pyxel.KEY_RIGHT) and xp_r<=app.width-self.width: 
+        if pyxel.btn(pyxel.KEY_RIGHT) and xp_r<=app.width-self.width:
             self.direction = "right"
+            self.run = True
             for i in range(self.speed):
                 if not self.next_dest_is_obstacle(app, 1, 0):
                     app.player_x_abs += 1
@@ -73,10 +80,22 @@ class Player:
         player_screen_y = app.screen_center_y + (app.player_y_abs - app.y_center) - self.height//2
         animation_frame = (pyxel.frame_count // 10) % 8
         if self.direction == "up":
-            idle_up(player_screen_x, player_screen_y, animation_frame)
+            if self.run:
+                pass
+            else:
+                idle_up(player_screen_x, player_screen_y, animation_frame)
         elif self.direction == "down":
-            pyxel.blt(player_screen_x, player_screen_y, 0, 24 * animation_frame, 0, 23, 39, 11)
+            if self.run:
+                run_down(player_screen_x, player_screen_y, animation_frame)
+            else:
+                pyxel.blt(player_screen_x, player_screen_y, 0, 24 * animation_frame, 0, 23, 39, 11)
         elif self.direction == "left":
-            idle_left(player_screen_x, player_screen_y, animation_frame)
+            if self.run:
+                pass
+            else:
+                idle_left(player_screen_x, player_screen_y, animation_frame)
         elif self.direction == "right":
-            idle_right(player_screen_x, player_screen_y, animation_frame)
+            if self.run:
+                pass
+            else:
+                idle_right(player_screen_x, player_screen_y, animation_frame)
