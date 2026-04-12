@@ -1,7 +1,22 @@
 import pyxel
 
 def idle_left(x_offset, y_offset, anim_frame):
-    {0: Idle_left0(x_offset, y_offset), 1: Idle_left1(x_offset, y_offset), 2: Idle_left2(x_offset, y_offset), 3: Idle_left3(x_offset, y_offset), 4: Idle_left4(x_offset, y_offset), 5: Idle_left5(x_offset, y_offset), 6: Idle_left6(x_offset, y_offset), 7: Idle_left7(x_offset, y_offset)}[anim_frame]
+    if anim_frame == 0:
+        Idle_left0(x_offset, y_offset)
+    elif anim_frame == 1:
+        Idle_left1(x_offset, y_offset)
+    elif anim_frame == 2:
+        Idle_left2(x_offset, y_offset)
+    elif anim_frame == 3:
+        Idle_left3(x_offset, y_offset)
+    elif anim_frame == 4:
+        Idle_left4(x_offset, y_offset)
+    elif anim_frame == 5:
+        Idle_left5(x_offset, y_offset)
+    elif anim_frame == 6:
+        Idle_left6(x_offset, y_offset)
+    elif anim_frame == 7:
+        Idle_left7(x_offset, y_offset)
 
 def Idle_left0(x_offset, y_offset):
     pyxel.pset(8 + x_offset, 0 + y_offset, 1)

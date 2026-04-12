@@ -1,7 +1,22 @@
 import pyxel
 
 def idle_up(x_offset, y_offset, anim_frame):
-    {0: Idle_up0(x_offset, y_offset), 1: Idle_up1(x_offset, y_offset), 2: Idle_up2(x_offset, y_offset), 3: Idle_up3(x_offset, y_offset), 4: Idle_up4(x_offset, y_offset), 5: Idle_up5(x_offset, y_offset), 6: Idle_up6(x_offset, y_offset), 7: Idle_up7(x_offset, y_offset)}[anim_frame]
+    if anim_frame == 0:
+        Idle_up0(x_offset, y_offset)
+    elif anim_frame == 1:
+        Idle_up1(x_offset, y_offset)
+    elif anim_frame == 2:
+        Idle_up2(x_offset, y_offset)
+    elif anim_frame == 3:
+        Idle_up3(x_offset, y_offset)
+    elif anim_frame == 4:
+        Idle_up4(x_offset, y_offset)
+    elif anim_frame == 5:
+        Idle_up5(x_offset, y_offset)
+    elif anim_frame == 6:
+        Idle_up6(x_offset, y_offset)
+    elif anim_frame == 7:
+        Idle_up7(x_offset, y_offset)
 
 def Idle_up0(x_offset, y_offset):
     pyxel.pset(9 + x_offset, 0 + y_offset, 1)
