@@ -1,4 +1,7 @@
 import pyxel
+from Textures.Perso.idle_up import idle_up
+from Textures.Perso.idle_left import idle_left
+from Textures.Perso.idle_right import idle_right
 
 class Player:
 
@@ -70,10 +73,10 @@ class Player:
         player_screen_y = app.screen_center_y + (app.player_y_abs - app.y_center) - self.height//2
         animation_frame = (pyxel.frame_count // 10) % 8
         if self.direction == "up":
-            pyxel.blt(player_screen_x, player_screen_y, 0, 24 * animation_frame, 120, 23, 39, 11)
+            idle_up(player_screen_x, player_screen_y, animation_frame)
         elif self.direction == "down":
             pyxel.blt(player_screen_x, player_screen_y, 0, 24 * animation_frame, 0, 23, 39, 11)
         elif self.direction == "left":
-            pyxel.blt(player_screen_x, player_screen_y, 0, 24 * animation_frame, 40, 23, 39, 11)
+            idle_left(player_screen_x, player_screen_y, animation_frame)
         elif self.direction == "right":
-            pyxel.blt(player_screen_x, player_screen_y, 0, 24 * animation_frame, 80, 23, 39, 11)
+            idle_right(player_screen_x, player_screen_y, animation_frame)
