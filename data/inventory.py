@@ -1,12 +1,25 @@
 import pyxel
+from data.items import sword, bow, staff, Armor
 
 
 class Inventory:
     def __init__(self):
-        self.items = []
+        self.items = {i : None for i in range(24)}
+        self.items["arme"] = None
+        self.items["armure"] = None
+        self.items[0] = sword("Épée de base", "Une épée simple mais efficace.", 32, 0, 10)
+        self.items[1] = bow("Arc de base", "Un arc simple pour attaquer à distance.", 64, 0, 8, 3)
+        self.items[2] = staff("Bâton de base", "Un bâton magique pour les attaques à distance.", 0, 0, 6, 4)
+        self.items[7] = Armor("Armure de base", "Une armure simple pour se protéger.", 64, 224, 5)
         self.on_screen = False
+        self.dragging_item = None
+        self.old_drag_case = None
     def open(self):
         self.on_screen = not self.on_screen
+        pyxel.mouse(self.on_screen)
+        if self.on_screen:
+            self.items[self.old_drag_case] = self.dragging_item
+            self.dragging_item = None
     def afficher(self, app):
         if self.on_screen:
             px, py = 80, 40
@@ -16,7 +29,7 @@ class Inventory:
             # Preview joueur
             pyxel.rect(px+16, py+12, 48, 64, 5)
             pyxel.rectb(px+16, py+12, 48, 64, 6)
-            pyxel.blt(px+28, py+20, 0, 0, 0, 23, 39, colkey=3)  # 11 = couleur transparente
+            pyxel.blt(px+28, py+20, 0, 0, 0, 23, 39, colkey=3) 
 
             # Slots armure et arme
             for i in range(2):
@@ -34,3 +47,58 @@ class Inventory:
                     sx, sy = px+100 + col*36, py+16 + row*36
                     pyxel.rect(sx, sy, 32, 32, 5)
                     pyxel.rectb(sx, sy, 32, 32, 6)
+            self.afficher_items()
+    def afficher_items(self):
+        if self.on_screen:
+            for idx, item in self.items.items():
+                if item is None or (self.dragging_item is not None and idx == self.old_drag_case):
+                    continue
+                if idx is None:
+                    continue
+                if type(idx) == str:
+                    sx = 90 if idx == "arme" else 130
+                    sy = 128
+                else:
+                    sx = 180 + (idx % 6) * 36
+                    sy = 56 + (idx // 6) * 36
+                pyxel.blt(sx, sy, 2, item.image_x, item.image_y, 32, 32, colkey=item.colkey)
+            self.show_drag_item()
+    def récuperer_case_souris(self):
+        if not self.on_screen:
+            return None
+        mx, my = pyxel.mouse_x, pyxel.mouse_y
+        #vérifie pour les cases d'equipement actif armure et arme
+        if 90 <= mx < 90 + 32 and 128 <= my < 128 + 32:
+            return "arme"
+        if 130 <= mx < 130 + 32 and 128 <= my < 128 + 32:
+            return "armure"
+        return int(f"{(my - 56) // 36}{(mx - 180) // 36}", 6) if 180 <= mx < 180 + 6*36 and 56 <= my < 56 + 4*36 else None
+    def drag_item(self, app):
+        case = self.récuperer_case_souris()
+        if self.dragging_item is not None:
+            if case is not None :
+                if self.items[case] is None:
+                    self.items[case] = self.dragging_item
+                    self.dragging_item = None
+                    self.old_drag_case = None
+                else:
+                    temp = self.dragging_item
+                    self.items[case], self.dragging_item = temp, self.items[case]
+                    self.items[self.old_drag_case] = None
+                    self.old_drag_case = None
+
+            else:
+                self.items[self.old_drag_case] = self.dragging_item
+                self.dragging_item = None
+                self.old_drag_case = None
+            return
+        
+        if case is None:
+            return
+        self.old_drag_case = case
+        self.dragging_item = self.items[case]
+        self.items[case] = None
+    def show_drag_item(self):
+        if self.dragging_item is not None:
+            mx, my = pyxel.mouse_x, pyxel.mouse_y
+            pyxel.blt(mx - 16, my - 16, 2, self.dragging_item.image_x, self.dragging_item.image_y, 32, 32, colkey=self.dragging_item.colkey)

@@ -14,7 +14,7 @@ class Player:
         xp_r = app.screen_center_x + (app.player_x_abs - app.x_center) - self.width//2
         yp_r = app.screen_center_y + (app.player_y_abs - app.y_center) - self.height//2
         self.run = False
-        if pyxel.btn(pyxel.KEY_UP) and yp_r >= 0:
+        if pyxel.btn(pyxel.KEY_UP) or pyxel.btn(pyxel.KEY_Z) and yp_r >= 0:
             self.direction = "up"
             self.run = True
             for i in range(self.speed):
@@ -22,7 +22,7 @@ class Player:
                     app.player_y_abs -= 1
                 else:
                     break
-        if pyxel.btn(pyxel.KEY_DOWN) and yp_r<=app.height-self.height:
+        if pyxel.btn(pyxel.KEY_DOWN) or pyxel.btn(pyxel.KEY_S) and yp_r<=app.height-self.height:
             self.direction = "down"
             self.run = True
             for i in range(self.speed):
@@ -30,7 +30,7 @@ class Player:
                     app.player_y_abs += 1
                 else:
                     break
-        if pyxel.btn(pyxel.KEY_LEFT) and xp_r>=0:
+        if pyxel.btn(pyxel.KEY_LEFT) or pyxel.btn(pyxel.KEY_Q) and xp_r>=0:
             self.direction = "left"
             self.run = True
             for i in range(self.speed):
@@ -38,7 +38,7 @@ class Player:
                     app.player_x_abs -= 1
                 else:
                     break
-        if pyxel.btn(pyxel.KEY_RIGHT) and xp_r<=app.width-self.width:
+        if pyxel.btn(pyxel.KEY_RIGHT) or pyxel.btn(pyxel.KEY_D) and xp_r<=app.width-self.width:
             self.direction = "right"
             self.run = True
             for i in range(self.speed):
@@ -46,6 +46,7 @@ class Player:
                     app.player_x_abs += 1
                 else:
                     break
+        
 
     def check_key(self, app):
         if pyxel.btnp(pyxel.KEY_SPACE):
@@ -55,9 +56,11 @@ class Player:
                 app.timestop = False
                 app.recentrer = True
         if pyxel.btnp(pyxel.KEY_R):
-            print(app.obstacle)
+            print(app.inventory.récuperer_case_souris())
         if pyxel.btnp(pyxel.KEY_I):
             app.inventory.open()
+        if app.inventory.on_screen and pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
+            app.inventory.drag_item(app)
 
     def collision_rect(self, x1, y1, w1, h1, x2, y2, w2, h2):
         return (x1 < x2 + w2 and

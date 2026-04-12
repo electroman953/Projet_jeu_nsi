@@ -17,7 +17,7 @@ class World:
     def deplace(self, app, speed=1):
         dx, dy = 0, 0
         app.player.run = False
-        if pyxel.btn(pyxel.KEY_RIGHT):
+        if pyxel.btn(pyxel.KEY_RIGHT) or pyxel.btn(pyxel.KEY_D):
             app.player.direction = "right"
             app.player.run = True
             for _ in range(speed):
@@ -25,7 +25,7 @@ class World:
                     dx += 1
                 else:
                     break
-        if pyxel.btn(pyxel.KEY_LEFT):
+        if pyxel.btn(pyxel.KEY_LEFT) or pyxel.btn(pyxel.KEY_Q):
             app.player.direction = "left"
             app.player.run = True
             for _ in range(speed):
@@ -33,7 +33,7 @@ class World:
                     dx -= 1
                 else:
                     break
-        if pyxel.btn(pyxel.KEY_UP):
+        if pyxel.btn(pyxel.KEY_UP) or pyxel.btn(pyxel.KEY_Z):
             app.player.direction = "up"
             app.player.run = True
             for _ in range(speed):
@@ -41,7 +41,7 @@ class World:
                     dy -= 1
                 else:
                     break
-        if pyxel.btn(pyxel.KEY_DOWN):
+        if pyxel.btn(pyxel.KEY_DOWN) or pyxel.btn(pyxel.KEY_S):
             app.player.direction = "down"
             app.player.run = True
             for _ in range(speed):
