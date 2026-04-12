@@ -57,6 +57,8 @@ class Player:
                 app.recentrer = True
         if pyxel.btnp(pyxel.KEY_R):
             print(app.obstacle)
+        if pyxel.btnp(pyxel.KEY_I):
+            app.inventory.open()
 
     def collision_rect(self, x1, y1, w1, h1, x2, y2, w2, h2):
         return (x1 < x2 + w2 and
@@ -76,6 +78,7 @@ class Player:
         player_screen_x = app.screen_center_x + (app.player_x_abs - app.x_center) - self.width//2
         player_screen_y = app.screen_center_y + (app.player_y_abs - app.y_center) - self.height//2
         animation_frame = (pyxel.frame_count // 10) % 8
+        run_animation_frame = (pyxel.frame_count // 5) % 8
         if self.run:
             pass
         else:
@@ -87,7 +90,7 @@ class Player:
                 pyxel.blt(player_screen_x, player_screen_y, 0, 24 * animation_frame, 120, 23, 39, 3)
         elif self.direction == "down":
             if self.run:
-                run_down(player_screen_x, player_screen_y, animation_frame)
+                run_down(player_screen_x, player_screen_y, run_animation_frame)
             else:
                 pyxel.blt(player_screen_x, player_screen_y, 0, 24 * animation_frame, 0, 23, 39, 3)
         elif self.direction == "left":

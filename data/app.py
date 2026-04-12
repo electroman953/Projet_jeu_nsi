@@ -1,11 +1,12 @@
 import pyxel
 from data.world import World
 from data.player import Player
+from data.inventory import Inventory
 
 class App:
     
     def __init__(self):
-
+        self.on_menu = False
         self.timestop = False
         self.width = 512
         self.height = 256
@@ -30,7 +31,7 @@ class App:
         self.x_center, self.y_center = self.screen_center_x, self.screen_center_y
 
 
-        
+        self.inventory = Inventory()
         self.player = Player()
         self.player_x_abs,self.player_y_abs = self.x_center, self.y_center
         self.world = World(self.width, self.height,2)
@@ -45,8 +46,12 @@ class App:
         self.world.recentrer(self, 10)
         if self.recentrer:
             return
-        
+        if self.on_menu:
+            return
+        if self.inventory.on_screen:
+            return
         self.load_walls()
+
         if self.timestop == False:
             self.world.deplace(self, self.player.speed)
         else:
@@ -54,14 +59,19 @@ class App:
             
     def draw(self):
         pyxel.cls(0)
-            
+        if self.on_menu:
+            return
+        
+        
         self.world.place_map(self.x_center, self.y_center, self)
         self.player.draw(self)
         if self.timestop:
             pyxel.colors[:] = self.palette_timestop
         else:
             pyxel.colors[:] = self.palette_normal    
-
+        if self.inventory.on_screen:
+            self.inventory.afficher(self)
+            
     def load_walls(self):
         self.obstacle = []
         
