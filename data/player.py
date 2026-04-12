@@ -1,5 +1,4 @@
 import pyxel
-from Textures.Perso.run_down import run_down
 
 class Player:
 
@@ -77,29 +76,29 @@ class Player:
         #coordonnées du joueur relatif à l'écran
         player_screen_x = app.screen_center_x + (app.player_x_abs - app.x_center) - self.width//2
         player_screen_y = app.screen_center_y + (app.player_y_abs - app.y_center) - self.height//2
-        animation_frame = (pyxel.frame_count // 10) % 8
+        idle_animation_frame = (pyxel.frame_count // 10) % 8
         run_animation_frame = (pyxel.frame_count // 5) % 8
         if self.run:
-            pass
+            pyxel.image(0).load(0, 0, "../Textures/Perso/run.png")
         else:
             pyxel.image(0).load(0, 0, "../Textures/Perso/idle.png")
         if self.direction == "up":
             if self.run:
-                pass
+                pyxel.blt(player_screen_x, player_screen_y, 0, 24 * run_animation_frame, 96, 23, 31, 3)
             else:
-                pyxel.blt(player_screen_x, player_screen_y, 0, 24 * animation_frame, 120, 23, 39, 3)
+                pyxel.blt(player_screen_x, player_screen_y, 0, 24 * idle_animation_frame, 120, 23, 39, 3)
         elif self.direction == "down":
             if self.run:
-                run_down(player_screen_x, player_screen_y, run_animation_frame)
+                pyxel.blt(player_screen_x, player_screen_y, 0, 24 * run_animation_frame, 0, 23, 31, 3)
             else:
-                pyxel.blt(player_screen_x, player_screen_y, 0, 24 * animation_frame, 0, 23, 39, 3)
+                pyxel.blt(player_screen_x, player_screen_y, 0, 24 * idle_animation_frame, 0, 23, 39, 3)
         elif self.direction == "left":
             if self.run:
-                pass
+                pyxel.blt(player_screen_x, player_screen_y, 0, 24 * run_animation_frame, 32, 23, 31, 3)
             else:
-                pyxel.blt(player_screen_x, player_screen_y, 0, 24 * animation_frame, 40, 23, 39, 3)
+                pyxel.blt(player_screen_x, player_screen_y, 0, 24 * idle_animation_frame, 40, 23, 39, 3)
         elif self.direction == "right":
             if self.run:
-                pass
+                pyxel.blt(player_screen_x, player_screen_y, 0, 24 * run_animation_frame, 64, 23, 31, 3)
             else:
-                pyxel.blt(player_screen_x, player_screen_y, 0, 24 * animation_frame, 80, 23, 39, 3)
+                pyxel.blt(player_screen_x, player_screen_y, 0, 24 * idle_animation_frame, 80, 23, 39, 3)
