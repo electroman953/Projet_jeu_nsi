@@ -16,6 +16,8 @@ class World:
 
     def deplace(self, app, speed=1):
         dx, dy = 0, 0
+        real_speed = speed
+        speed = int(speed+1)
         app.player.run = False
         if pyxel.btn(pyxel.KEY_RIGHT) or pyxel.btn(pyxel.KEY_D):
             app.player.direction = "right"
@@ -49,11 +51,24 @@ class World:
                     dy += 1
                 else:
                     break
+        if dx == speed:
+            dx = real_speed
+        if dx == -speed:
+            dx = -real_speed
+        if dy == speed:
+            dy = real_speed
+        if dy == -speed:
+            dy = -real_speed
+        if dx != 0 and dy != 0:
+            dx/=pyxel.sqrt(2)
+            dy/=pyxel.sqrt(2)
+        
+            
 
         app.player_x_abs = max(app.player.width // 2, min(app.player_x_abs + dx, self.word_width - app.player.width // 2))
         app.player_y_abs = max(app.player.height // 2, min(app.player_y_abs + dy, self.word_height - app.player.height // 2))
-        app.x_center = max(app.width // 2, min(app.player_x_abs, self.word_width - app.width // 2))
-        app.y_center = max(app.height // 2, min(app.player_y_abs, self.word_height - app.height // 2))
+        app.x_center = int(max(app.width // 2, min(app.player_x_abs, self.word_width - app.width // 2)))
+        app.y_center = int(max(app.height // 2, min(app.player_y_abs, self.word_height - app.height // 2)))
 
     def recentrer(self, app, speed = 5):
         if not app.recentrer:

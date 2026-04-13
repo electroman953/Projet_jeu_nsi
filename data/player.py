@@ -3,7 +3,7 @@ import pyxel
 class Player:
 
     def __init__(self):
-        self.speed = 2
+        self.speed = 2*pyxel.sqrt(2)
         self.width = 19
         self.height = 34
         self.direction = "down"
@@ -14,12 +14,13 @@ class Player:
         xp_r = app.screen_center_x + (app.player_x_abs - app.x_center) - self.width//2
         yp_r = app.screen_center_y + (app.player_y_abs - app.y_center) - self.height//2
         self.run = False
+        player_y_abs = player_x_abs = 0
         if pyxel.btn(pyxel.KEY_UP) or pyxel.btn(pyxel.KEY_Z) and yp_r >= 0:
             self.direction = "up"
             self.run = True
             for i in range(self.speed):
                 if not self.next_dest_is_obstacle(app, 0, -1):
-                    app.player_y_abs -= 1
+                    player_y_abs -= 1
                 else:
                     break
         if pyxel.btn(pyxel.KEY_DOWN) or pyxel.btn(pyxel.KEY_S) and yp_r<=app.height-self.height:
@@ -27,7 +28,7 @@ class Player:
             self.run = True
             for i in range(self.speed):
                 if not self.next_dest_is_obstacle(app, 0, 1):
-                    app.player_y_abs += 1
+                    player_y_abs += 1
                 else:
                     break
         if pyxel.btn(pyxel.KEY_LEFT) or pyxel.btn(pyxel.KEY_Q) and xp_r>=0:
@@ -35,7 +36,7 @@ class Player:
             self.run = True
             for i in range(self.speed):
                 if not self.next_dest_is_obstacle(app, -1, 0):
-                    app.player_x_abs -= 1
+                    player_x_abs -= 1
                 else:
                     break
         if pyxel.btn(pyxel.KEY_RIGHT) or pyxel.btn(pyxel.KEY_D) and xp_r<=app.width-self.width:
@@ -43,10 +44,22 @@ class Player:
             self.run = True
             for i in range(self.speed):
                 if not self.next_dest_is_obstacle(app, 1, 0):
-                    app.player_x_abs += 1
+                    player_x_abs += 1
                 else:
                     break
+        if player_x_abs == speed:
+            player_x_abs = real_speed
+        if player_x_abs == -speed:
+            player_x_abs = -real_speed
+        if player_y_abs == speed:
+            player_y_abs = real_speed
+        if player_y_abs == -speed:
+            player_y_abs = -real_speed
+        if player_x_abs != 0 and player_y_abs != 0:
+            player_x_abs/=pyxel.sqrt(2)
+            player_y_abs/=pyxel.sqrt(2)
         
+                    
 
     def check_key(self, app):
         if pyxel.btnp(pyxel.KEY_SPACE):
