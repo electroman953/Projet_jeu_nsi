@@ -3,12 +3,14 @@ from data.world import World
 from data.player import Player
 from data.inventory import Inventory
 from data.mob import Mob
+from data.arrow import Arrow
 
 class App:
     
     def __init__(self):
         self.on_menu = False
         self.timestop = False
+        self.timestop_timer = 0
         self.width = 512
         self.height = 256
         self.elt_col = [(16, 21), (16, 22), (16, 23), (16, 24), (16, 25), (16, 26), (16, 27), (17, 21), (17, 22), (17, 23), (17, 24), (17, 25), (17, 26), (17, 27), (18, 21), (18, 22), (18, 23), (18, 24), (18, 25), (18, 26), (18, 27), (19, 21), (19, 22), (19, 23), (19, 24), (19, 25), (19, 26), (19, 27), (20, 21), (20, 22), (20, 23), (20, 24), (20, 25), (20, 26), (20, 27), (21, 21), (21, 22), (21, 23), (21, 24), (21, 25), (21, 26), (21, 27)]
@@ -31,6 +33,8 @@ class App:
         ]      
         self.x_center, self.y_center = self.screen_center_x, self.screen_center_y
 
+        self.projectiles = []
+
         self.mobs = [('slime', 50, 50), ('slime', 75, 75), ('slime', 100, 100)]
         self.create_mobs()
 
@@ -52,8 +56,22 @@ class App:
             temp.append(mob)
         self.mobs = temp
 
+    def add_player_projectile(self, type, subtype):
+        a={"arrow":{"basic":(3,5)}}
+        xr = pyxel.mouse_x - (self.player.player_screen_x + self.player.width // 2)
+        yr = pyxel.mouse_y - (self.player.player_screen_y + self.player.width // 2)
+        hr = pyxel.sqrt(xr**2 + yr**2)
+        if hr == 0:
+            hr=1
+        rotation = pyxel.atan2(yr, xr) - pyxel.atan2(-1, 1)
+        self.projectiles.append(Arrow(self.player_x_abs, self.player_y_abs - self.player.height//4, a[type][subtype][1], rotation, (xr/hr, yr/hr), a[type][subtype][0], subtype))
+
     def update(self):
         self.player.check_key(self)
+        if pyxel.frame_count % 30 == 0:
+            self.timestop_timer = max(0, self.timestop_timer - 0.5)
+            for i in self.projectiles:
+                i.supprimer(self)
         self.world.recentrer(self, 10)
         if self.recentrer:
             return
@@ -61,9 +79,10 @@ class App:
             return
         if self.inventory.on_screen:
             return
+        if self.inventory.items["arme"]:
+            self.inventory.items["arme"].etat_arme(True, self)
         self.load_walls()
-        self.move_mobs()
-
+        
         if self.timestop == False:
             self.world.deplace(self, self.player.speed)
         else:
@@ -78,6 +97,7 @@ class App:
         self.world.place_map(self.x_center, self.y_center, self)
         self.player.draw(self)
         self.place_mobs()
+        self.place_projectiles()
 
         if self.timestop:
             pyxel.colors[:] = self.palette_timestop
@@ -89,10 +109,12 @@ class App:
     def place_mobs(self):
         for i in self.mobs:
             i.draw(self)
-    
-    def move_mobs(self):
-        for i in self.mobs:
             i.move(self, self.player_x_abs, self.player_y_abs)
+    
+    def place_projectiles(self):
+        for i in self.projectiles:
+            i.draw(self)
+            i.move()
 
     def load_walls(self):
         self.obstacle = []
@@ -102,4 +124,3 @@ class App:
                 
                 if pyxel.tilemaps[self.world.tm].pget(x // 8, y // 8) in self.elt_col:
                     self.obstacle.append((x//8, y//8))
-    

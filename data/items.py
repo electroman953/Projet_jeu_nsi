@@ -1,3 +1,5 @@
+import pyxel
+
 class Item:
     def __init__(self, name, description, image_x, image_y):
         self.name = name
@@ -6,11 +8,17 @@ class Item:
         self.image_y = image_y
         self.durability = 100
         self.colkey = 0
+        self.type = None
 class Weapon(Item):
     def __init__(self, name, description, image_x, image_y, damage):
         super().__init__(name, description, image_x, image_y)
         self.damage = damage
         self.parent_type = "weapon"
+    
+    def etat_arme(self, actif):
+        pass
+
+            
 class Armor(Item):
     def __init__(self, name, description, image_x, image_y, defense):
         super().__init__(name, description, image_x, image_y)
@@ -25,12 +33,21 @@ class range_weapon(Weapon):
     def __init__(self, name, description, image_x, image_y, damage, range):
         super().__init__(name, description, image_x, image_y, damage)
         self.range = range
+    def etat_arme(self, actif, app):
+        pyxel.mouse(actif)
+        if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT) and actif:
+            self.attack(app)
+        
 
 class bow(range_weapon):
     def __init__(self, name, description, image_x, image_y, damage, range):
         super().__init__(name, description, image_x, image_y, damage, range)
         self.type = "bow"
         self.colkey = 7
+
+    def attack(self, app):
+        app.add_player_projectile("arrow", "basic")
+
 class staff(range_weapon):
     def __init__(self, name, description, image_x, image_y, damage, range):
         super().__init__(name, description, image_x, image_y, damage, range)
