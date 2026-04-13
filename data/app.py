@@ -53,9 +53,9 @@ class App:
 
     def create_mobs(self):
         temp = []
-        type={"slime": {"health": 100, "damage": 10, "height": 16, "width": 16, "color": 8}}
+        type={"slime": {"health": 100, "damage": 10, "height": 16, "width": 16, "color": 8, "xp_drop_range": (5, 15), "loot_table": []}}
         for mob_type, x, y in self.mobs:
-            mob = Mob(type[mob_type]["health"], type[mob_type]["damage"], mob_type, x, y, type[mob_type]["width"], type[mob_type]["height"], type[mob_type]["color"])
+            mob = Mob(type[mob_type]["health"], type[mob_type]["damage"], mob_type, x, y, type[mob_type]["width"], type[mob_type]["height"], type[mob_type]["color"], type[mob_type]["xp_drop_range"], type[mob_type]["loot_table"])
             temp.append(mob)
         self.mobs = temp
 
@@ -72,6 +72,8 @@ class App:
     def update(self):
         self.player.check_key(self)
         if pyxel.frame_count % 6 == 0:
+            for i in self.mobs:
+                i.is_dead(self)
             if self.timestop_timer > 0:
                 self.timestop_timer = max(0, self.timestop_timer - 0.1)
             if self.timestop_cooldown > 0:
@@ -130,6 +132,14 @@ class App:
         for i in self.projectiles:
             i.draw(self)
             i.move()
+            for j in self.mobs:
+                if i.collision_mob(j):
+                    damage = self.calcul_degats(self.inventory.items["arme"], i)
+                    j.prendre_degats(damage)
+                    j.is_dead(self)
+                    if i in self.projectiles:
+                        self.projectiles.remove(i)
+                    break
 
     def load_walls(self):
         self.obstacle = []
@@ -139,3 +149,18 @@ class App:
                 
                 if pyxel.tilemaps[self.world.tm].pget(x // 8, y // 8) in self.elt_col:
                     self.obstacle.append((x//8, y//8))
+    def calcul_degats(self, item, arrow = None):
+        base_damage = self.player.base_damage + item.liste_attributs.get("damage", 0)
+        crit_chance_bonus = item.liste_attributs.get("crit_chance_bonus", 0)
+        crit_multiplier_bonus = item.liste_attributs.get("crit_multiplier_bonus", 0)
+        if arrow:
+            base_damage += arrow.damage * arrow.damage_multiplier
+            crit_chance_bonus += arrow.crit_chance_bonus
+            crit_multiplier_bonus += arrow.crit_multiplier_bonus
+        crit_chance = self.player.base_critical_chance + crit_chance_bonus
+        crit_multiplier = self.player.base_critical_multiplier + crit_multiplier_bonus
+        if pyxel.rndi(0, 100) < crit_chance * 100:
+            return base_damage * crit_multiplier
+        else:
+            return base_damage
+        

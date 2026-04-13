@@ -2,7 +2,7 @@
 import pyxel
 
 class Mob:
-    def __init__(self, health, damage, type, x, y, w, h, c):
+    def __init__(self, health, damage, type, x, y, w, h, c, xp_drop_range, loot_table=None):
         self.health = health
         self.damage = damage
         self.type = type
@@ -13,6 +13,8 @@ class Mob:
         self.color = c
         self.vitesse = 1
         self.chemin  = []
+        self.xp_drop_range = xp_drop_range
+        self.loot_table = loot_table if loot_table is not None else []
         self.timer = 0
         self.detection_range = 200
     def draw(self, app):
@@ -57,7 +59,21 @@ class Mob:
                 x1 + w1 > x2 and
                 y1 < y2 + h2 and
                 y1 + h1 > y2)
-    
+    def prendre_degats(self, damage):
+        self.health -= damage
+        if self.health <= 0:
+            self.health = 0
+    def is_dead(self, app):
+        if self.health == 0:
+            xp_drop = pyxel.rndi(self.xp_drop_range[0], self.xp_drop_range[1])
+            app.player.experience += xp_drop
+            print(app.player.experience)
+            for item in self.loot_table:
+                if pyxel.rndf() < item["drop_chance"]:
+                    app.inventory.add_item(item["item"])
+            app.mobs.remove(self)
+            
+
     def next_dest_is_obstacle(self, app, dx, dy):
         next_x = self.x - self.width//2 + dx
         next_y = self.y - self.height//2 + dy

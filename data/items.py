@@ -9,30 +9,36 @@ class Item:
         self.durability = 100
         self.colkey = 0
         self.type = None
+        self.liste_attributs = {}
 class Weapon(Item):
-    def __init__(self, name, description, image_x, image_y, damage):
+    def __init__(self, name, description, image_x, image_y, damage, crit_chance_bonus=0, crit_multiplier_bonus=0, attack_speed_bonus=0):
         super().__init__(name, description, image_x, image_y)
-        self.damage = damage
         self.parent_type = "weapon"
-    
+        self.liste_attributs["damage"] = damage
+        self.liste_attributs["crit_chance_bonus"] = crit_chance_bonus
+        self.liste_attributs["crit_multiplier_bonus"] = crit_multiplier_bonus
+        self.liste_attributs["attack_speed_bonus"] = attack_speed_bonus
+
     def etat_arme(self, actif):
         pass
 
             
 class Armor(Item):
-    def __init__(self, name, description, image_x, image_y, defense):
+    def __init__(self, name, description, image_x, image_y, defense, bonus_health=0):
         super().__init__(name, description, image_x, image_y)
-        self.defense = defense
         self.type = "armor"
-        self.parent_type = "armor"    
+        self.parent_type = "armor"
+
+        self.liste_attributs["defense"] = defense
+        self.liste_attributs["bonus_health"] = bonus_health
 class sword(Weapon):
-    def __init__(self, name, description, image_x, image_y, damage):
-        super().__init__(name, description, image_x, image_y, damage)
+    def __init__(self, name, description, image_x, image_y, damage, crit_chance_bonus=0.05, crit_multiplier_bonus=0.5, attack_speed_bonus=0.2):
+        super().__init__(name, description, image_x, image_y, damage, crit_chance_bonus=0.05, crit_multiplier_bonus=0.5, attack_speed_bonus=0.2)
         self.type = "sword"
 class range_weapon(Weapon):
-    def __init__(self, name, description, image_x, image_y, damage, range):
-        super().__init__(name, description, image_x, image_y, damage)
-        self.range = range
+    def __init__(self, name, description, image_x, image_y, damage, range, crit_chance_bonus=0.05, crit_multiplier_bonus=0.5, attack_speed_bonus=0.2):
+        super().__init__(name, description, image_x, image_y, damage, crit_chance_bonus=0.05, crit_multiplier_bonus=0.5, attack_speed_bonus=0.2)
+        self.liste_attributs["range"] = range
     def etat_arme(self, actif, app):
         pyxel.mouse(actif)
         if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT) and actif:
@@ -40,8 +46,8 @@ class range_weapon(Weapon):
         
 
 class bow(range_weapon):
-    def __init__(self, name, description, image_x, image_y, damage, range):
-        super().__init__(name, description, image_x, image_y, damage, range)
+    def __init__(self, name, description, image_x, image_y, damage, range, crit_chance_bonus=0.05, crit_multiplier_bonus=0.5, attack_speed_bonus=0.2):
+        super().__init__(name, description, image_x, image_y, damage, range, crit_chance_bonus, crit_multiplier_bonus, attack_speed_bonus)
         self.type = "bow"
         self.colkey = 7
 
@@ -49,8 +55,8 @@ class bow(range_weapon):
         app.add_player_projectile("arrow", "basic")
 
 class staff(range_weapon):
-    def __init__(self, name, description, image_x, image_y, damage, range):
-        super().__init__(name, description, image_x, image_y, damage, range)
+    def __init__(self, name, description, image_x, image_y, damage, range, crit_chance_bonus=0.05, crit_multiplier_bonus=0.5, attack_speed_bonus=0.2):
+        super().__init__(name, description, image_x, image_y, damage, range, crit_chance_bonus, crit_multiplier_bonus, attack_speed_bonus)
         self.type = "staff"
 
 preset_sword = sword("Épée de base", "Une épée simple mais efficace.", 32, 0, 10)

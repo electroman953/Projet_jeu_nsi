@@ -9,6 +9,17 @@ class Player:
         self.direction = "down"
         self.run = False
         self.en_attaque = False
+        
+        
+        
+        self.base_damage = 10
+        self.base_health = 100
+        self.base_critical_chance = 0.1
+        self.base_critical_multiplier = 1.5
+        self.base_attack_speed = 1
+        self.level = 1
+        self.experience = 0
+        
 
     def deplace(self, app):
         #coordonnées du joueur relatif à l'écran
