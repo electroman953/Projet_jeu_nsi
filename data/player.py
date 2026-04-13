@@ -62,7 +62,10 @@ class Player:
         
         app.player_x_abs += player_x_abs
         app.player_y_abs += player_y_abs
-                    
+        hw = self.width // 2
+        hh = self.height // 2
+        app.player_x_abs = max(hw, min(app.player_x_abs, app.world.word_width - hw))
+        app.player_y_abs = max(hh, min(app.player_y_abs, app.world.word_height - hh))
 
     def check_key(self, app):
         if pyxel.btnp(pyxel.KEY_SPACE):

@@ -14,6 +14,7 @@ class Mob:
         self.vitesse = 1
         self.chemin  = []
         self.timer = 0
+        self.detection_range = 200
     def draw(self, app):
         self.screen_x = app.screen_center_x + (self.x - app.x_center)
         self.screen_y = app.screen_center_y + (self.y - app.y_center)
@@ -21,6 +22,10 @@ class Mob:
         #pyxel.blt(self.x, self.y, 0, 0, 0, 16, 16)
     def move(self, app, player_x, player_y):
         if self.health <= 0:
+            return
+        if app.timestop:
+            return
+        if abs(self.x - player_x) + abs(self.y - player_y) > self.detection_range:
             return
         self.timer += 1
         if self.timer % 30 == 0:
