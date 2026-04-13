@@ -7,9 +7,9 @@ class Inventory:
         self.items = {i : None for i in range(24)}
         self.items["arme"] = None
         self.items["armure"] = None
-        self.items[0] = sword("Épée de base", "Une épée simple mais efficace.", 32, 0, 10)
-        self.items[1] = bow("Arc de base", "Un arc simple pour attaquer à distance.", 64, 0, 8, 3)
-        self.items[2] = staff("Bâton de base", "Un bâton magique pour les attaques à distance.", 0, 0, 6, 4)
+        self.items[0] = sword("Epee de base", "Une Epee simple mais efficace.", 32, 0, 10)
+        self.items[1] = bow("Arc de base", "Un arc simple pour attaquer a distance.", 64, 0, 8, 3)
+        self.items[2] = staff("Baton de base", "Un baton magique pour les attaques a distance.", 0, 0, 6, 4)
         self.items[7] = Armor("Armure de base", "Une armure simple pour se protéger.", 64, 224, 5)
         self.on_screen = False
         self.dragging_item = None
@@ -102,3 +102,24 @@ class Inventory:
         if self.dragging_item is not None:
             mx, my = pyxel.mouse_x, pyxel.mouse_y
             pyxel.blt(mx - 16, my - 16, 2, self.dragging_item.image_x, self.dragging_item.image_y, 32, 32, colkey=self.dragging_item.colkey)
+    def over_item(self):
+        case = self.récuperer_case_souris()
+        if case is None:
+            return
+        item = self.items[case]
+        if item is None:
+            return
+
+        mx, my = pyxel.mouse_x, pyxel.mouse_y
+        lines = [item.name, item.description] + item.get_stats()
+
+        w = max(len(l) * 4 + 8 for l in lines)
+        h = len(lines) * 9 + 6
+        tx = mx + 10 if mx + 10 + w < 512 else mx - w - 4
+        ty = my - h - 4 if my - h - 4 > 0 else my + 10
+
+        pyxel.rect (tx, ty, w, h, 1)
+        pyxel.rectb(tx, ty, w, h, 6)
+        for i in range(len(lines)):
+            color = 7 if i == 0 else (6 if i == 1 else 10)
+            pyxel.text(tx + 4, ty + 4 + i * 9, lines[i], color)

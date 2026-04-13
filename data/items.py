@@ -10,6 +10,12 @@ class Item:
         self.colkey = 0
         self.type = None
         self.liste_attributs = {}
+    def get_stats(self):
+        stats = []
+        for i, j in self.liste_attributs.items():
+            if j != 0:
+                stats.append(f"{i} : {j}")
+        return stats
 class Weapon(Item):
     def __init__(self, name, description, image_x, image_y, damage, crit_chance_bonus=0, crit_multiplier_bonus=0, attack_speed_bonus=0):
         super().__init__(name, description, image_x, image_y)
