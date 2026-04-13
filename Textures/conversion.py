@@ -3,7 +3,7 @@ import sys
 
 # CONFIGURATION
 INPUT_FILE = "res.pyxres"   # fichier .pyxres en entrée
-OUTPUT_FILE = "run.png"     # fichier PNG de sortie
+OUTPUT_FILE = "attack 2 down and left.png"     # fichier PNG de sortie
 
 pyxel.init(256, 256)
 pyxel.load(INPUT_FILE)
