@@ -102,7 +102,7 @@ class Inventory:
         if self.dragging_item is not None:
             mx, my = pyxel.mouse_x, pyxel.mouse_y
             pyxel.blt(mx - 16, my - 16, 2, self.dragging_item.image_x, self.dragging_item.image_y, 32, 32, colkey=self.dragging_item.colkey)
-    def over_item(self):
+    def over_item(self, app):
         case = self.récuperer_case_souris()
         if case is None:
             return
@@ -111,7 +111,7 @@ class Inventory:
             return
 
         mx, my = pyxel.mouse_x, pyxel.mouse_y
-        lines = [item.name, item.description] + item.get_stats()
+        lines = [item.name, item.description] + item.get_stats(app)
 
         w = max(len(l) * 4 + 8 for l in lines)
         h = len(lines) * 9 + 6

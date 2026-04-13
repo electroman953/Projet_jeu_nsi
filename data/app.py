@@ -19,7 +19,7 @@ class App:
         self.elt_col = [(16, 21), (16, 22), (16, 23), (16, 24), (16, 25), (16, 26), (16, 27), (17, 21), (17, 22), (17, 23), (17, 24), (17, 25), (17, 26), (17, 27), (18, 21), (18, 22), (18, 23), (18, 24), (18, 25), (18, 26), (18, 27), (19, 21), (19, 22), (19, 23), (19, 24), (19, 25), (19, 26), (19, 27), (20, 21), (20, 22), (20, 23), (20, 24), (20, 25), (20, 26), (20, 27), (21, 21), (21, 22), (21, 23), (21, 24), (21, 25), (21, 26), (21, 27)]
         self.screen_center_x = self.width // 2
         self.screen_center_y = self.height // 2
-        self.correspondance_nom = {"damage" : "DMG", "crit_chance_bonus" : "CRIT CHANCE", "crit_multiplier_bonus" : "CRIT MULTIPLIER", "attack_speed_bonus" : "ATK SPEED", "defense" : "DEF", "bonus_health" : "HP"}
+        self.correspondance_nom = {"damage" : "DMG", "crit_chance_bonus" : "CRIT CHANCE", "crit_multiplier_bonus" : "CRIT MULTIPLIER", "attack_speed_bonus" : "ATK SPEED", "defense" : "DEF", "bonus_health" : "HP", "range" : "RANGE"}
         self.palette_normal = [
             0x0D0D0D, 0x1D2B53, 0x7E2553, 0x008751,
             0xAB5236, 0x1E8C0A, 0xC2C3C7, 0xFFF1E8,  
@@ -123,7 +123,7 @@ class App:
             pyxel.colors[:] = self.palette_normal    
         if self.inventory.on_screen:
             self.inventory.afficher(self)
-            self.inventory.over_item()
+            self.inventory.over_item(self)
 
     def place_mobs(self):
         for i in self.mobs:
