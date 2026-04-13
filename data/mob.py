@@ -11,6 +11,9 @@ class Mob:
         self.width = w
         self.height = h
         self.color = c
+        self.vitesse = 1
+        self.chemin  = []
+        self.timer = 0
     def draw(self, app):
         self.screen_x = app.screen_center_x + (self.x - app.x_center)
         self.screen_y = app.screen_center_y + (self.y - app.y_center)
@@ -19,17 +22,31 @@ class Mob:
     def move(self, app, player_x, player_y):
         if self.health <= 0:
             return
-        dx = player_x - self.x
-        dy = player_y - self.y
-        if abs(dx) > abs(dy):
-            step_x = 1 if dx > 0 else -1
-            if not self.next_dest_is_obstacle(app, step_x, 0):
-                self.x += step_x
-        else:
-            step_y = 1 if dy > 0 else -1
-            if not self.next_dest_is_obstacle(app, 0, step_y):
-                self.y += step_y
-
+        self.timer += 1
+        if self.timer % 30 == 0:
+            self.timer = 0
+            debut = (self.x//8, self.y//8)
+            fin = (player_x//8, player_y//8)
+            self.chemin = app.world.parcours_largeur(debut, fin, app)
+        if self.chemin:
+            next_cell = self.chemin[0]
+            next_x = next_cell[0]*8 + 4
+            next_y = next_cell[1]*8 + 4
+            dx = next_x - self.x
+            dy = next_y - self.y
+            if abs(dx) > self.vitesse:
+                dx = self.vitesse if dx > 0 else -self.vitesse
+            elif abs(dx) > 0:
+                dx = dx
+            if abs(dy) > self.vitesse:
+                dy = self.vitesse if dy > 0 else -self.vitesse
+            elif abs(dy) > 0:
+                dy = dy
+            self.x += dx
+            self.y += dy
+            if self.x == next_x and self.y == next_y:
+                self.chemin.pop(0)
+            
     def collision_rect(self, x1, y1, w1, h1, x2, y2, w2, h2):
         return (x1 < x2 + w2 and
                 x1 + w1 > x2 and

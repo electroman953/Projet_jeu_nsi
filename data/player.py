@@ -3,7 +3,7 @@ import pyxel
 class Player:
 
     def __init__(self):
-        self.speed = 2
+        self.speed = 2*pyxel.sqrt(2)
         self.width = 19
         self.height = 34
         self.direction = "down"
@@ -11,6 +11,7 @@ class Player:
 
     def deplace(self, app):
         #coordonnées du joueur relatif à l'écran
+        temp_speed = int(self.speed + 1)
         xp_r = app.screen_center_x + (app.player_x_abs - app.x_center) - self.width//2
         yp_r = app.screen_center_y + (app.player_y_abs - app.y_center) - self.height//2
         self.run = False
@@ -18,7 +19,7 @@ class Player:
         if pyxel.btn(pyxel.KEY_UP) or pyxel.btn(pyxel.KEY_Z) and yp_r >= 0:
             self.direction = "up"
             self.run = True
-            for i in range(self.speed):
+            for i in range(temp_speed):
                 if not self.next_dest_is_obstacle(app, 0, -1):
                     player_y_abs -= 1
                 else:
@@ -26,7 +27,7 @@ class Player:
         if pyxel.btn(pyxel.KEY_DOWN) or pyxel.btn(pyxel.KEY_S) and yp_r<=app.height-self.height:
             self.direction = "down"
             self.run = True
-            for i in range(self.speed):
+            for i in range(temp_speed):
                 if not self.next_dest_is_obstacle(app, 0, 1):
                     player_y_abs += 1
                 else:
@@ -34,7 +35,7 @@ class Player:
         if pyxel.btn(pyxel.KEY_LEFT) or pyxel.btn(pyxel.KEY_Q) and xp_r>=0:
             self.direction = "left"
             self.run = True
-            for i in range(self.speed):
+            for i in range(temp_speed):
                 if not self.next_dest_is_obstacle(app, -1, 0):
                     player_x_abs -= 1
                 else:
@@ -42,18 +43,18 @@ class Player:
         if pyxel.btn(pyxel.KEY_RIGHT) or pyxel.btn(pyxel.KEY_D) and xp_r<=app.width-self.width:
             self.direction = "right"
             self.run = True
-            for i in range(self.speed):
+            for i in range(temp_speed):
                 if not self.next_dest_is_obstacle(app, 1, 0):
                     player_x_abs += 1
                 else:
                     break
-        if player_x_abs == self.speed:
+        if player_x_abs == temp_speed:
             player_x_abs = self.speed
-        if player_x_abs == -self.speed:
+        if player_x_abs == -temp_speed:
             player_x_abs = -self.speed
-        if player_y_abs == self.speed:
+        if player_y_abs == temp_speed:
             player_y_abs = self.speed
-        if player_y_abs == -self.speed:
+        if player_y_abs == -temp_speed:
             player_y_abs = -self.speed
         if player_x_abs != 0 and player_y_abs != 0:
             player_x_abs/=pyxel.sqrt(2)

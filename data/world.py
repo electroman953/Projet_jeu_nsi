@@ -92,3 +92,30 @@ class World:
 
         if app.x_center == target_x and app.y_center == target_y:
             app.recentrer = False
+    def parcours_largeur(self, debut, fin, app):
+        obstacles = [(i, j) for i, j in app.obstacle]
+        queue = [debut]
+        viens_de = {debut: None}
+        while queue:
+            actuel = queue.pop(0)
+            if actuel == fin:
+                chemin = []
+                while actuel is not None:
+                    chemin.append(actuel)
+                    actuel = viens_de[actuel]
+                    chemin=chemin[::-1]
+                return chemin[1:]
+            for dx, dy in [(0,1),(0,-1),(1,0),(-1,0),(1,1),(1,-1),(-1,1),(-1,-1)]:
+                voisin = (actuel[0] + dx, actuel[1] + dy)
+                if not (0 <= voisin[0] < self.word_width and 0 <= voisin[1] < self.word_height):
+                    continue
+                if dx != 0 and dy != 0:
+                    if (actuel[0] + dx, actuel[1]) in obstacles or (actuel[0], actuel[1] + dy) in obstacles:
+                        continue
+                if voisin in obstacles or voisin in viens_de:  
+                    continue
+                viens_de[voisin] = actuel
+                queue.append(voisin)
+
+        return []
+    
