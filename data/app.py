@@ -10,7 +10,10 @@ class App:
     def __init__(self):
         self.on_menu = False
         self.timestop = False
+        self.TIMESTOP_DURATION = 5
+        self.TIMESTOP_COOLDOWN = 10
         self.timestop_timer = 0
+        self.timestop_cooldown = 0
         self.width = 512
         self.height = 256
         self.elt_col = [(16, 21), (16, 22), (16, 23), (16, 24), (16, 25), (16, 26), (16, 27), (17, 21), (17, 22), (17, 23), (17, 24), (17, 25), (17, 26), (17, 27), (18, 21), (18, 22), (18, 23), (18, 24), (18, 25), (18, 26), (18, 27), (19, 21), (19, 22), (19, 23), (19, 24), (19, 25), (19, 26), (19, 27), (20, 21), (20, 22), (20, 23), (20, 24), (20, 25), (20, 26), (20, 27), (21, 21), (21, 22), (21, 23), (21, 24), (21, 25), (21, 26), (21, 27)]
@@ -68,11 +71,20 @@ class App:
 
     def update(self):
         self.player.check_key(self)
+        if pyxel.frame_count % 6 == 0:
+            if self.timestop_timer > 0:
+                self.timestop_timer = max(0, self.timestop_timer - 0.1)
+            if self.timestop_cooldown > 0:
+                self.timestop_cooldown = max(0, self.timestop_cooldown - 0.1)
         if pyxel.frame_count % 30 == 0:
-            self.timestop_timer = max(0, self.timestop_timer - 0.5)
             for i in self.projectiles:
                 i.supprimer(self)
+        if self.timestop and self.timestop_timer == 0:
+            self.timestop = False
+            self.recentrer = True
+            self.timestop_cooldown = self.TIMESTOP_COOLDOWN
         self.world.recentrer(self, 10)
+        
         if self.recentrer:
             return
         if self.on_menu:
@@ -87,6 +99,9 @@ class App:
             self.world.deplace(self, self.player.speed)
         else:
             self.player.deplace(self)
+            if self.timestop_timer == 0:
+                self.timestop = False
+                self.recentrer = True
             
     def draw(self):
         pyxel.cls(0)

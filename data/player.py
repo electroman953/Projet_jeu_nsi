@@ -70,12 +70,13 @@ class Player:
 
     def check_key(self, app):
         if pyxel.btnp(pyxel.KEY_SPACE):
-            if app.timestop == False and app.timestop_timer == 0:
+            if app.timestop == False and app.timestop_cooldown == 0:
                 app.timestop = True
-                app.timestop_timer = 5
+                app.timestop_timer = app.TIMESTOP_DURATION
             else:
                 app.timestop = False
                 app.recentrer = True
+                app.timestop_cooldown = app.TIMESTOP_COOLDOWN
         if pyxel.btnp(pyxel.KEY_R):
             print(app.inventory.récuperer_case_souris())
         if pyxel.btnp(pyxel.KEY_I):
