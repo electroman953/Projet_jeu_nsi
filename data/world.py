@@ -74,8 +74,8 @@ class World:
         if not app.recentrer:
             return
 
-        target_x = max(app.width // 2, min(app.player_x_abs, self.word_width - app.width // 2))
-        target_y = max(app.height // 2, min(app.player_y_abs, self.word_height - app.height // 2))
+        target_x = int(max(app.width // 2, min(app.player_x_abs, self.word_width - app.width // 2)))
+        target_y = int(max(app.height // 2, min(app.player_y_abs, self.word_height - app.height // 2)))
 
         diff_x = target_x - app.x_center
         diff_y = target_y - app.y_center

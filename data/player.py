@@ -3,7 +3,7 @@ import pyxel
 class Player:
 
     def __init__(self):
-        self.speed = 2*pyxel.sqrt(2)
+        self.speed = 2
         self.width = 19
         self.height = 34
         self.direction = "down"
@@ -47,18 +47,20 @@ class Player:
                     player_x_abs += 1
                 else:
                     break
-        if player_x_abs == speed:
-            player_x_abs = real_speed
-        if player_x_abs == -speed:
-            player_x_abs = -real_speed
-        if player_y_abs == speed:
-            player_y_abs = real_speed
-        if player_y_abs == -speed:
-            player_y_abs = -real_speed
+        if player_x_abs == self.speed:
+            player_x_abs = self.speed
+        if player_x_abs == -self.speed:
+            player_x_abs = -self.speed
+        if player_y_abs == self.speed:
+            player_y_abs = self.speed
+        if player_y_abs == -self.speed:
+            player_y_abs = -self.speed
         if player_x_abs != 0 and player_y_abs != 0:
             player_x_abs/=pyxel.sqrt(2)
             player_y_abs/=pyxel.sqrt(2)
         
+        app.player_x_abs += player_x_abs
+        app.player_y_abs += player_y_abs
                     
 
     def check_key(self, app):
@@ -95,9 +97,9 @@ class Player:
         idle_animation_frame = (pyxel.frame_count // 10) % 8
         run_animation_frame = (pyxel.frame_count // 5) % 8
         if self.run:
-            pyxel.image(0).load(0, 0, "../Textures/Perso/run.png")
+            pyxel.images[0].load(0, 0, "../Textures/Perso/run.png")
         else:
-            pyxel.image(0).load(0, 0, "../Textures/Perso/idle.png")
+            pyxel.images[0].load(0, 0, "../Textures/Perso/idle.png")
         if self.direction == "up":
             if self.run:
                 pyxel.blt(player_screen_x, player_screen_y, 0, 24 * run_animation_frame, 96, 23, 31, 3)

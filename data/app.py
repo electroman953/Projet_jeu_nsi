@@ -2,6 +2,7 @@ import pyxel
 from data.world import World
 from data.player import Player
 from data.inventory import Inventory
+from data.mob import Mob
 
 class App:
     
@@ -30,6 +31,8 @@ class App:
         ]      
         self.x_center, self.y_center = self.screen_center_x, self.screen_center_y
 
+        self.mobs = [('slime', 50, 50), ('slime', 75, 75), ('slime', 100, 100)]
+        self.create_mobs()
 
         self.inventory = Inventory()
         self.player = Player()
@@ -41,6 +44,14 @@ class App:
         print(pyxel.VERSION)
         pyxel.run(self.update, self.draw)
 
+    def create_mobs(self):
+        temp = []
+        type={"slime": {"health": 100, "damage": 10, "height": 16, "width": 16, "color": 8}}
+        for mob_type, x, y in self.mobs:
+            mob = Mob(type[mob_type]["health"], type[mob_type]["damage"], mob_type, x, y, type[mob_type]["width"], type[mob_type]["height"], type[mob_type]["color"])
+            temp.append(mob)
+        self.mobs = temp
+
     def update(self):
         self.player.check_key(self)
         self.world.recentrer(self, 10)
@@ -51,6 +62,7 @@ class App:
         if self.inventory.on_screen:
             return
         self.load_walls()
+        self.move_mobs()
 
         if self.timestop == False:
             self.world.deplace(self, self.player.speed)
@@ -65,13 +77,23 @@ class App:
         
         self.world.place_map(self.x_center, self.y_center, self)
         self.player.draw(self)
+        self.place_mobs()
+
         if self.timestop:
             pyxel.colors[:] = self.palette_timestop
         else:
             pyxel.colors[:] = self.palette_normal    
         if self.inventory.on_screen:
             self.inventory.afficher(self)
-            
+
+    def place_mobs(self):
+        for i in self.mobs:
+            i.draw(self)
+    
+    def move_mobs(self):
+        for i in self.mobs:
+            i.move(self, self.player_x_abs, self.player_y_abs)
+
     def load_walls(self):
         self.obstacle = []
         
