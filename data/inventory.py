@@ -2,16 +2,12 @@ import pyxel
 from data.items import sword, bow, staff, Armor
 
 class Inventory:
-    def __init__(self):
+    def __init__(self, app):
         self.items = {i : None for i in range(24)}
         self.items["arme"] = None
         self.items["armure"] = None
-        self.items[0] = sword("Epee de base", "Une Epee simple mais efficace.", 32, 0, 10)
-        self.items[1] = bow("Arc de base", "Un arc simple pour attaquer a distance.", 64, 0, 8)
-        self.items[2] = staff("Baton de base", "Un baton magique pour les attaques a distance.", 0, 0, 6)
-        self.items[7] = Armor("Armure de base", "Une armure simple pour se protéger.", 64, 224, 5)
-        self.items["arme"] = self.items[0]
-        self.items[0] = None
+        for i in range(1, 21):
+            self.items[i] = make_item(app.items[i])
         self.on_screen = False
         self.dragging_item = None
         self.old_drag_case = None
@@ -126,3 +122,9 @@ class Inventory:
         for i in range(len(lines)):
             color = 7 if i == 0 else (6 if i == 1 else 10)
             pyxel.text(tx + 4, ty + 4 + i * 9, lines[i], color)
+def make_item(data):
+    type_, name, desc, x, y, stat, *extra = data
+    bonus = extra[0] if extra else {}
+    constructors = {"sword": sword, "bow": bow, "staff": staff, "armor": Armor}
+    item = constructors[type_](name, desc, x, y, stat, **bonus)
+    return item

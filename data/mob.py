@@ -1,4 +1,3 @@
-
 import pyxel
 
 class Mob:
@@ -14,6 +13,9 @@ class Mob:
         self.vitesse = 1
         self.chemin  = []
         
+        self.knockback_vx = 0
+        self.knockback_vy = 0
+        
         self.xp_drop_range = xp_drop_range
         self.loot_table = loot_table if loot_table is not None else []
         self.timer = 0
@@ -28,6 +30,26 @@ class Mob:
             return
         if app.timestop:
             return
+            
+        if abs(self.knockback_vx) > 0.1 or abs(self.knockback_vy) > 0.1:
+            move_x = int(self.knockback_vx)
+            move_y = int(self.knockback_vy)
+            
+            if move_x != 0 and not self.next_dest_is_obstacle(app, move_x, 0):
+                self.x += move_x
+            if move_y != 0 and not self.next_dest_is_obstacle(app, 0, move_y):
+                self.y += move_y
+                
+            if hasattr(app.world, 'word_width'):
+                self.x = max(self.width // 2, min(self.x, app.world.word_width - self.width // 2))
+                self.y = max(self.height // 2, min(self.y, app.world.word_height - self.height // 2))
+
+            self.knockback_vx *= 0.8
+            self.knockback_vy *= 0.8
+            if abs(self.knockback_vx) < 0.5: self.knockback_vx = 0
+            if abs(self.knockback_vy) < 0.5: self.knockback_vy = 0
+            return
+
         if abs(self.x - player_x) + abs(self.y - player_y) > self.detection_range:
             return
         self.timer += 1
@@ -90,34 +112,10 @@ class Mob:
         if distance == 0:
             dx, dy = 1, 0
             distance = 1
-        total_x = (dx / distance) * force
-        total_y = (dy / distance) * force
-        steps = max(1, int(force * 2))
-        step_x = total_x / steps
-        step_y = total_y / steps
-        acc_x = 0
-        acc_y = 0
-        for _ in range(steps):
-            acc_x += step_x
-            acc_y += step_y
-            move_x = 0
-            move_y = 0
-            if abs(acc_x) >= 1:
-                move_x = 1 if acc_x > 0 else -1
-                acc_x -= move_x
-            if abs(acc_y) >= 1:
-                move_y = 1 if acc_y > 0 else -1
-                acc_y -= move_y
-            if move_x == 0 and move_y == 0:
-                continue
-            if move_x != 0 and not self.next_dest_is_obstacle(app, move_x, 0):
-                self.x += move_x
-            if move_y != 0 and not self.next_dest_is_obstacle(app, 0, move_y):
-                self.y += move_y
-
-            self.x = max(self.width // 2, min(self.x, app.world.word_width - self.width // 2))
-            self.y = max(self.height // 2, min(self.y, app.world.word_height - self.height // 2))
-
+            
+        # On définit une vélocité initiale en fonction de la force
+        self.knockback_vx = (dx / distance) * (force / 3)
+        self.knockback_vy = (dy / distance) * (force / 3)
         self.chemin = []
 
     def is_dead(self, app):
