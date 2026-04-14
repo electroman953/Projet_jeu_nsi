@@ -56,7 +56,7 @@ class App:
         self.projectiles = []
         self.mobs = [
             ('slime', random.randint(32, 1000), random.randint(32, 1000))
-            for _ in range(50)
+            for _ in range(5)
         ]
         self.create_mobs()
         self.inventory = Inventory()
@@ -235,6 +235,7 @@ class App:
                 mob_box[0], mob_box[1], mob_box[2], mob_box[3]
             )
             if hit_by_slash or hit_by_contact:
+                self.player.en_attaque = 8
                 damage = self.calcul_degats(self.inventory.items["arme"])
                 j.prendre_degats(damage)
                 j.appliquer_knockback(self, self.player_x_abs, self.player_y_abs, force=self.MELEE_KNOCKBACK_FORCE)

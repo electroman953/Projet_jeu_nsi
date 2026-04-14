@@ -8,7 +8,8 @@ class Player:
         self.height = 34
         self.direction = "down"
         self.run = False
-        self.en_attaque = False
+        self.en_attaque = 0
+        self.next_anim_attaque = 0
         
         self.base_damage = 10
         self.base_health = 100
@@ -126,6 +127,12 @@ class Player:
         self.player_screen_y = app.screen_center_y + (app.player_y_abs - app.y_center) - self.height//2
         idle_animation_frame = (pyxel.frame_count // 10) % 8
         run_animation_frame = (pyxel.frame_count // 5) % 8
+        if self.en_attaque > 0:
+            self.next_anim_attaque -= 1
+            if self.next_anim_attaque <= 0:
+                self.next_anim_attaque = 3
+                self.en_attaque -= 1
+        attack_animation_frame = 8 - self.en_attaque
         """
         Coordonnées attack 2
         taille down : 55, 47
@@ -139,25 +146,37 @@ class Player:
         """
         if self.run:
             pyxel.images[0].load(0, 0, "../Textures/Perso/run.png")
+        elif self.en_attaque > 0 and self.direction in ["down", "left"]:
+            pyxel.images[0].load(0, 0, "../Textures/Perso/attack 2 down and left.png")
+        elif self.en_attaque > 0 and self.direction in ["right", "up"]:
+            pyxel.images[0].load(0, 0, "../Textures/Perso/attack 2 right and up.png")
         else:
             pyxel.images[0].load(0, 0, "../Textures/Perso/idle.png")
         if self.direction == "up":
             if self.run:
                 pyxel.blt(self.player_screen_x, self.player_screen_y, 0, 24 * run_animation_frame, 96, 23, 31, 3)
+            elif self.en_attaque > 0:
+                pyxel.blt(self.player_screen_x, self.player_screen_y, 0, 55 * (attack_animation_frame % 4), 80 + (39 * (attack_animation_frame // 4)), 55, 39, 3)
             else:
                 pyxel.blt(self.player_screen_x, self.player_screen_y, 0, 24 * idle_animation_frame, 120, 23, 39, 3)
         elif self.direction == "down":
             if self.run:
                 pyxel.blt(self.player_screen_x, self.player_screen_y, 0, 24 * run_animation_frame, 0, 23, 31, 3)
+            elif self.en_attaque > 0:
+                pyxel.blt(self.player_screen_x, self.player_screen_y, 0, 55 * (attack_animation_frame % 4), 0 + (47 * (attack_animation_frame // 4)), 55, 47, 3)
             else:
                 pyxel.blt(self.player_screen_x, self.player_screen_y, 0, 24 * idle_animation_frame, 0, 23, 39, 3)
         elif self.direction == "left":
             if self.run:
                 pyxel.blt(self.player_screen_x, self.player_screen_y, 0, 24 * run_animation_frame, 32, 23, 31, 3)
+            elif self.en_attaque > 0:
+                pyxel.blt(self.player_screen_x, self.player_screen_y, 0, 63 * (attack_animation_frame % 4), 96 + (31 * (attack_animation_frame // 4)), 63, 31, 3)
             else:
                 pyxel.blt(self.player_screen_x, self.player_screen_y, 0, 24 * idle_animation_frame, 40, 23, 39, 3)
         elif self.direction == "right":
             if self.run:
                 pyxel.blt(self.player_screen_x, self.player_screen_y, 0, 24 * run_animation_frame, 64, 23, 31, 3)
+            elif self.en_attaque > 0:
+                pyxel.blt(self.player_screen_x, self.player_screen_y, 0, 55 * (attack_animation_frame % 4), 0 + (39 * (attack_animation_frame // 4)), 55, 39, 3)
             else:
                 pyxel.blt(self.player_screen_x, self.player_screen_y, 0, 24 * idle_animation_frame, 80, 23, 39, 3)
