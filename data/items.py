@@ -45,6 +45,7 @@ class Armor(Item):
 
         self.liste_attributs["defense"] = defense
         self.liste_attributs["bonus_health"] = bonus_health
+
 class sword(Weapon):
     def __init__(self, name, description, image_x, image_y, damage, crit_chance_bonus=0.05, crit_multiplier_bonus=0.5, attack_speed_bonus=0.2):
         super().__init__(name, description, image_x, image_y, damage, crit_chance_bonus=0.05, crit_multiplier_bonus=0.5, attack_speed_bonus=0.2)
@@ -52,13 +53,12 @@ class sword(Weapon):
     def attack(self, app):
         if app.sword_cooldown <= 0:
             app.player_slash()
-            app.sword_cooldown = app.SWORD_COOLDOWN
+            app.sword_cooldown = app.SWORD_COOLDOWN - self.liste_attributs.get("attack_speed_bonus", 0)
+
 class range_weapon(Weapon):
     def __init__(self, name, description, image_x, image_y, damage, range, crit_chance_bonus=0.05, crit_multiplier_bonus=0.5, attack_speed_bonus=0.2):
         super().__init__(name, description, image_x, image_y, damage, crit_chance_bonus=0.05, crit_multiplier_bonus=0.5, attack_speed_bonus=0.2)
         self.liste_attributs["range"] = range
-
-        
 
 class bow(range_weapon):
     def __init__(self, name, description, image_x, image_y, damage, range, crit_chance_bonus=0.05, crit_multiplier_bonus=0.5, attack_speed_bonus=0.2):
@@ -67,9 +67,9 @@ class bow(range_weapon):
         self.colkey = 7
 
     def attack(self, app):
-        if app.bow_cooldown-self.liste_attributs["attack_speed_bonus"]<=0:
+        if app.bow_cooldown <= 0:
             app.add_player_projectile("arrow", "basic")
-            app.bow_cooldown = app.BOW_COOLDOWN
+            app.bow_cooldown = app.BOW_COOLDOWN - self.liste_attributs["attack_speed_bonus"]
 
 class staff(range_weapon):
     def __init__(self, name, description, image_x, image_y, damage, range, crit_chance_bonus=0.05, crit_multiplier_bonus=0.5, attack_speed_bonus=0.2):

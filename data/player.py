@@ -91,7 +91,7 @@ class Player:
         if pyxel.btnp(pyxel.KEY_R):
             print(app.inventory.récuperer_case_souris())
         if pyxel.btnp(pyxel.KEY_I):
-            app.inventory.open()
+            app.inventory.open(app)
         if app.inventory.on_screen and pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
             app.inventory.drag_item(app)
 
