@@ -1,21 +1,21 @@
 import pyxel
 from data.items import sword, bow, staff, Armor
 
-
 class Inventory:
     def __init__(self):
         self.items = {i : None for i in range(24)}
         self.items["arme"] = None
         self.items["armure"] = None
         self.items[0] = sword("Epee de base", "Une Epee simple mais efficace.", 32, 0, 10)
-        self.items[1] = bow("Arc de base", "Un arc simple pour attaquer a distance.", 64, 0, 8, 3)
-        self.items[2] = staff("Baton de base", "Un baton magique pour les attaques a distance.", 0, 0, 6, 4)
+        self.items[1] = bow("Arc de base", "Un arc simple pour attaquer a distance.", 64, 0, 8)
+        self.items[2] = staff("Baton de base", "Un baton magique pour les attaques a distance.", 0, 0, 6)
         self.items[7] = Armor("Armure de base", "Une armure simple pour se protéger.", 64, 224, 5)
         self.items["arme"] = self.items[0]
         self.items[0] = None
         self.on_screen = False
         self.dragging_item = None
         self.old_drag_case = None
+
     def open(self, app):
         self.on_screen = not self.on_screen
         app.timestop = self.on_screen
