@@ -156,27 +156,27 @@ class Player:
             if self.run:
                 pyxel.blt(self.player_screen_x, self.player_screen_y, 0, 24 * run_animation_frame, 96, 23, 31, 3)
             elif self.en_attaque > 0:
-                pyxel.blt(self.player_screen_x, self.player_screen_y, 0, 55 * (attack_animation_frame % 4), 80 + (39 * (attack_animation_frame // 4)), 55, 39, 3)
+                pyxel.blt(self.player_screen_x - 17, self.player_screen_y - 4, 0, 56 * (attack_animation_frame % 4), 80 + (40 * (attack_animation_frame // 4)), 56, 40, 3)
             else:
                 pyxel.blt(self.player_screen_x, self.player_screen_y, 0, 24 * idle_animation_frame, 120, 23, 39, 3)
         elif self.direction == "down":
             if self.run:
                 pyxel.blt(self.player_screen_x, self.player_screen_y, 0, 24 * run_animation_frame, 0, 23, 31, 3)
             elif self.en_attaque > 0:
-                pyxel.blt(self.player_screen_x, self.player_screen_y, 0, 55 * (attack_animation_frame % 4), 0 + (47 * (attack_animation_frame // 4)), 55, 47, 3)
+                pyxel.blt(self.player_screen_x - 14, self.player_screen_y, 0, 56 * (attack_animation_frame % 4), 0 + (48 * (attack_animation_frame // 4)), 56, 48, 3)
             else:
                 pyxel.blt(self.player_screen_x, self.player_screen_y, 0, 24 * idle_animation_frame, 0, 23, 39, 3)
         elif self.direction == "left":
             if self.run:
                 pyxel.blt(self.player_screen_x, self.player_screen_y, 0, 24 * run_animation_frame, 32, 23, 31, 3)
             elif self.en_attaque > 0:
-                pyxel.blt(self.player_screen_x, self.player_screen_y, 0, 63 * (attack_animation_frame % 4), 96 + (31 * (attack_animation_frame // 4)), 63, 31, 3)
+                pyxel.blt(self.player_screen_x - 20, self.player_screen_y, 0, 64 * (attack_animation_frame % 4), 96 + (32 * (attack_animation_frame // 4)), 64, 32, 3)
             else:
                 pyxel.blt(self.player_screen_x, self.player_screen_y, 0, 24 * idle_animation_frame, 40, 23, 39, 3)
         elif self.direction == "right":
             if self.run:
                 pyxel.blt(self.player_screen_x, self.player_screen_y, 0, 24 * run_animation_frame, 64, 23, 31, 3)
             elif self.en_attaque > 0:
-                pyxel.blt(self.player_screen_x, self.player_screen_y, 0, 55 * (attack_animation_frame % 4), 0 + (39 * (attack_animation_frame // 4)), 55, 39, 3)
+                pyxel.blt(self.player_screen_x - 14, self.player_screen_y, 0, 56 * (attack_animation_frame % 4), 0 + (40 * (attack_animation_frame // 4)), 56, 40, 3)
             else:
                 pyxel.blt(self.player_screen_x, self.player_screen_y, 0, 24 * idle_animation_frame, 80, 23, 39, 3)

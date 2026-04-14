@@ -21,6 +21,9 @@ class Item:
         if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT) and actif:
             app.orient_player_to_mouse()
             self.attack(app)
+            app.player.en_attaque = 8
+            app.player.next_anim_attaque = 3
+
 class Weapon(Item):
     def __init__(self, name, description, image_x, image_y, damage, crit_chance_bonus=0, crit_multiplier_bonus=0, attack_speed_bonus=0):
         super().__init__(name, description, image_x, image_y)

@@ -89,10 +89,10 @@ class App:
 
     def update(self):
         if self.on_menu:
-            if 224<pyxel.mouse_x<288 and 116<pyxel.mouse_y<148 and pyxel.btnr(pyxel.MOUSE_BUTTON_LEFT):
+            if (224<pyxel.mouse_x<288 and 116<pyxel.mouse_y<148 and pyxel.btnr(pyxel.MOUSE_BUTTON_LEFT)) or pyxel.btnr(pyxel.KEY_SPACE):
                 self.on_menu=False
         elif self.player.is_dead():
-            if 224<pyxel.mouse_x<288 and 116<pyxel.mouse_y<148 and pyxel.btnr(pyxel.MOUSE_BUTTON_LEFT):
+            if (224<pyxel.mouse_x<288 and 116<pyxel.mouse_y<148 and pyxel.btnr(pyxel.MOUSE_BUTTON_LEFT)) or pyxel.btnr(pyxel.KEY_SPACE):
                 self.start()
         else:
             if pyxel.btnp(pyxel.KEY_H):
@@ -235,7 +235,6 @@ class App:
                 mob_box[0], mob_box[1], mob_box[2], mob_box[3]
             )
             if hit_by_slash or hit_by_contact:
-                self.player.en_attaque = 8
                 damage = self.calcul_degats(self.inventory.items["arme"])
                 j.prendre_degats(damage)
                 j.appliquer_knockback(self, self.player_x_abs, self.player_y_abs, force=self.MELEE_KNOCKBACK_FORCE)
