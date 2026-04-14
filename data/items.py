@@ -21,8 +21,6 @@ class Item:
         if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT) and actif:
             app.orient_player_to_mouse()
             self.attack(app)
-            app.player.en_attaque = 8
-            app.player.next_anim_attaque = 3
 
 class Weapon(Item):
     def __init__(self, name, description, image_x, image_y, damage, crit_chance_bonus=0, crit_multiplier_bonus=0, attack_speed_bonus=0):
@@ -54,6 +52,8 @@ class sword(Weapon):
         if app.sword_cooldown <= 0:
             app.player_slash()
             app.sword_cooldown = app.SWORD_COOLDOWN - self.liste_attributs.get("attack_speed_bonus", 0)
+            app.player.en_attaque = 8
+            app.player.next_anim_attaque = 3
 
 class range_weapon(Weapon):
     def __init__(self, name, description, image_x, image_y, damage, range, crit_chance_bonus=0.05, crit_multiplier_bonus=0.5, attack_speed_bonus=0.2):
@@ -70,6 +70,8 @@ class bow(range_weapon):
         if app.bow_cooldown <= 0:
             app.add_player_projectile("arrow", "basic")
             app.bow_cooldown = app.BOW_COOLDOWN - self.liste_attributs["attack_speed_bonus"]
+            app.player.en_attaque = 8
+            app.player.next_anim_attaque = 3
 
 class staff(range_weapon):
     def __init__(self, name, description, image_x, image_y, damage, range, crit_chance_bonus=0.05, crit_multiplier_bonus=0.5, attack_speed_bonus=0.2):

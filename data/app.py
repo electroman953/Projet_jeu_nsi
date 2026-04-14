@@ -22,7 +22,7 @@ class App:
         self.TIMESTOP_COOLDOWN = 10
         self.BOW_COOLDOWN = .9
         self.bow_cooldown = 0
-        self.SWORD_COOLDOWN = 1
+        self.SWORD_COOLDOWN = .5
         self.SLASH_RANGE = 50
         self.MELEE_KNOCKBACK_FORCE = 50
         self.RANGED_KNOCKBACK_FORCE = 4
@@ -98,8 +98,6 @@ class App:
             if pyxel.btnp(pyxel.KEY_H):
                 self.debug_hitbox = not self.debug_hitbox
             self.player.check_key(self)
-            if self.inventory.on_screen:
-                return
             if pyxel.frame_count % 6 == 0:
                 for i in self.mobs:
                     i.is_dead(self)
@@ -126,6 +124,8 @@ class App:
                 return
             if self.on_menu:
                 
+                return
+            if self.inventory.on_screen:
                 return
             self.load_walls()
             if self.inventory.items["arme"]:
