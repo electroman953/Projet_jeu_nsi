@@ -16,6 +16,14 @@ class Item:
             if j != 0:
                 stats.append(f"{i if i not in app.correspondance_nom else app.correspondance_nom[i]} : {j}")
         return stats
+    def etat_arme(self, actif, app):
+        pyxel.mouse(actif)
+        if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT) and actif:
+            app.orient_player_to_mouse()
+            self.attack(app)
+            app.player.en_attaque = 8
+            app.player.next_anim_attaque = 3
+
 class Weapon(Item):
     def __init__(self, name, description, image_x, image_y, damage, crit_chance_bonus=0, crit_multiplier_bonus=0, attack_speed_bonus=0):
         super().__init__(name, description, image_x, image_y)
@@ -25,7 +33,7 @@ class Weapon(Item):
         self.liste_attributs["crit_multiplier_bonus"] = crit_multiplier_bonus
         self.liste_attributs["attack_speed_bonus"] = attack_speed_bonus
 
-    def etat_arme(self, actif):
+    def attack(self, app):
         pass
 
             
@@ -41,14 +49,15 @@ class sword(Weapon):
     def __init__(self, name, description, image_x, image_y, damage, crit_chance_bonus=0.05, crit_multiplier_bonus=0.5, attack_speed_bonus=0.2):
         super().__init__(name, description, image_x, image_y, damage, crit_chance_bonus=0.05, crit_multiplier_bonus=0.5, attack_speed_bonus=0.2)
         self.type = "sword"
+    def attack(self, app):
+        if app.sword_cooldown <= 0:
+            app.player_slash()
+            app.sword_cooldown = app.SWORD_COOLDOWN
 class range_weapon(Weapon):
     def __init__(self, name, description, image_x, image_y, damage, range, crit_chance_bonus=0.05, crit_multiplier_bonus=0.5, attack_speed_bonus=0.2):
         super().__init__(name, description, image_x, image_y, damage, crit_chance_bonus=0.05, crit_multiplier_bonus=0.5, attack_speed_bonus=0.2)
         self.liste_attributs["range"] = range
-    def etat_arme(self, actif, app):
-        pyxel.mouse(actif)
-        if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT) and actif:
-            self.attack(app)
+
         
 
 class bow(range_weapon):
@@ -58,7 +67,9 @@ class bow(range_weapon):
         self.colkey = 7
 
     def attack(self, app):
-        app.add_player_projectile("arrow", "basic")
+        if app.bow_cooldown-self.liste_attributs["attack_speed_bonus"]<=0:
+            app.add_player_projectile("arrow", "basic")
+            app.bow_cooldown = app.BOW_COOLDOWN
 
 class staff(range_weapon):
     def __init__(self, name, description, image_x, image_y, damage, range, crit_chance_bonus=0.05, crit_multiplier_bonus=0.5, attack_speed_bonus=0.2):

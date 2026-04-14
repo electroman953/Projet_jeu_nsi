@@ -11,6 +11,8 @@ class Inventory:
         self.items[1] = bow("Arc de base", "Un arc simple pour attaquer a distance.", 64, 0, 8, 3)
         self.items[2] = staff("Baton de base", "Un baton magique pour les attaques a distance.", 0, 0, 6, 4)
         self.items[7] = Armor("Armure de base", "Une armure simple pour se protéger.", 64, 224, 5)
+        self.items["arme"] = self.items[0]
+        self.items[0] = None
         self.on_screen = False
         self.dragging_item = None
         self.old_drag_case = None

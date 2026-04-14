@@ -1,4 +1,5 @@
 import pyxel
+import random
 from data.world import World
 from data.player import Player
 from data.inventory import Inventory
@@ -8,12 +9,28 @@ from data.arrow import Arrow
 class App:
     
     def __init__(self):
-        self.on_menu = False
+        self.start()
+        pyxel.init(self.width, self.height, title = "Jeu du héros", fps=60)
+        pyxel.load('../Textures/res.pyxres')
+        print(pyxel.VERSION)
+        pyxel.run(self.update, self.draw)
+
+    def start(self):
+        self.on_menu = True
         self.timestop = False
         self.TIMESTOP_DURATION = 5
         self.TIMESTOP_COOLDOWN = 10
+        self.BOW_COOLDOWN = .9
+        self.bow_cooldown = 0
+        self.SWORD_COOLDOWN = 0.5
+        self.SLASH_RANGE = 50
+        self.MELEE_KNOCKBACK_FORCE = 50
+        self.RANGED_KNOCKBACK_FORCE = 4
+        self.sword_cooldown = 0
         self.timestop_timer = 0
         self.timestop_cooldown = 0
+        self.invincible_timer = .5
+        self.i_frames = 0
         self.width = 512
         self.height = 256
         self.elt_col = [(16, 21), (16, 22), (16, 23), (16, 24), (16, 25), (16, 26), (16, 27), (17, 21), (17, 22), (17, 23), (17, 24), (17, 25), (17, 26), (17, 27), (18, 21), (18, 22), (18, 23), (18, 24), (18, 25), (18, 26), (18, 27), (19, 21), (19, 22), (19, 23), (19, 24), (19, 25), (19, 26), (19, 27), (20, 21), (20, 22), (20, 23), (20, 24), (20, 25), (20, 26), (20, 27), (21, 21), (21, 22), (21, 23), (21, 24), (21, 25), (21, 26), (21, 27)]
@@ -37,19 +54,19 @@ class App:
         self.x_center, self.y_center = self.screen_center_x, self.screen_center_y
 
         self.projectiles = []
-
-        self.mobs = [('slime', 50, 50), ('slime', 75, 75), ('slime', 100, 100)]
+        self.mobs = [
+            ('slime', random.randint(32, 1000), random.randint(32, 1000))
+            for _ in range(5)
+        ]
         self.create_mobs()
-
         self.inventory = Inventory()
         self.player = Player()
         self.player_x_abs,self.player_y_abs = self.x_center, self.y_center
         self.world = World(self.width, self.height,2)
         self.recentrer = False
-        pyxel.init(self.width, self.height, title = "Jeu du héros", fps=60)
-        pyxel.load('../Textures/res.pyxres')
-        print(pyxel.VERSION)
-        pyxel.run(self.update, self.draw)
+        self.obstacle = []
+        self.debug_hitbox = True
+        
 
     def create_mobs(self):
         temp = []
@@ -61,6 +78,7 @@ class App:
 
     def add_player_projectile(self, type, subtype):
         a={"arrow":{"basic":(3,5)}}
+        self.orient_player_to_mouse()
         xr = pyxel.mouse_x - (self.player.player_screen_x + self.player.width // 2)
         yr = pyxel.mouse_y - (self.player.player_screen_y + self.player.width // 2)
         hr = pyxel.sqrt(xr**2 + yr**2)
@@ -70,60 +88,91 @@ class App:
         self.projectiles.append(Arrow(self.player_x_abs, self.player_y_abs - self.player.height//4, a[type][subtype][1], rotation, (xr/hr, yr/hr), a[type][subtype][0], subtype))
 
     def update(self):
-        self.player.check_key(self)
-        if pyxel.frame_count % 6 == 0:
-            for i in self.mobs:
-                i.is_dead(self)
-            if self.timestop_timer > 0:
-                self.timestop_timer = max(0, self.timestop_timer - 0.1)
-            if self.timestop_cooldown > 0:
-                self.timestop_cooldown = max(0, self.timestop_cooldown - 0.1)
-        if pyxel.frame_count % 30 == 0:
-            for i in self.projectiles:
-                i.supprimer(self)
-        if self.timestop and self.timestop_timer == 0:
-            self.timestop = False
-            self.recentrer = True
-            self.timestop_cooldown = self.TIMESTOP_COOLDOWN
-        self.world.recentrer(self, 10)
-        
-        if self.recentrer:
-            return
         if self.on_menu:
-            
-            return
-        if self.inventory.on_screen:
-            return
-        if self.inventory.items["arme"]:
-            self.inventory.items["arme"].etat_arme(True, self)
-        self.load_walls()
-        
-        if self.timestop == False:
-            self.world.deplace(self, self.player.speed)
+            if (224<pyxel.mouse_x<288 and 116<pyxel.mouse_y<148 and pyxel.btnr(pyxel.MOUSE_BUTTON_LEFT)) or pyxel.btnr(pyxel.KEY_SPACE):
+                self.on_menu=False
+        elif self.player.is_dead():
+            if (224<pyxel.mouse_x<288 and 116<pyxel.mouse_y<148 and pyxel.btnr(pyxel.MOUSE_BUTTON_LEFT)) or pyxel.btnr(pyxel.KEY_SPACE):
+                self.start()
         else:
-            self.player.deplace(self)
-            if self.timestop_timer == 0:
+            if pyxel.btnp(pyxel.KEY_H):
+                self.debug_hitbox = not self.debug_hitbox
+            self.player.check_key(self)
+            if pyxel.frame_count % 6 == 0:
+                for i in self.mobs:
+                    i.is_dead(self)
+                if self.timestop_timer > 0:
+                    self.timestop_timer = max(0, round(self.timestop_timer - 0.1, 1))
+                if self.timestop_cooldown > 0:
+                    self.timestop_cooldown = max(0, round(self.timestop_cooldown - 0.1, 1))
+                if self.bow_cooldown > 0:
+                    self.bow_cooldown = max(0, round(self.bow_cooldown - 0.1, 1))
+                if self.sword_cooldown > 0:
+                    self.sword_cooldown = max(0, round(self.sword_cooldown - 0.1, 1))
+                if self.i_frames > 0:
+                    self.i_frames = max(0, round(self.i_frames - 0.1, 1))
+            if pyxel.frame_count % 30 == 0:
+                for i in self.projectiles:
+                    i.supprimer(self)
+            if self.timestop and self.timestop_timer == 0:
                 self.timestop = False
                 self.recentrer = True
+                self.timestop_cooldown = self.TIMESTOP_COOLDOWN
+            self.world.recentrer(self, 10)
+            
+            if self.recentrer:
+                return
+            if self.on_menu:
+                
+                return
+            if self.inventory.on_screen:
+                return
+            self.load_walls()
+            if self.inventory.items["arme"]:
+                self.inventory.items["arme"].etat_arme(True, self)
+            
+            if self.timestop == False:
+                self.world.deplace(self, self.player.speed)
+            else:
+                self.player.deplace(self)
+                # Keep player on screen during timestop
+                hw = self.player.width // 2
+                hh = self.player.height // 2
+                self.player_x_abs = max(self.x_center - self.width//2 + hw, min(self.player_x_abs, self.x_center + self.width//2 - hw))
+                self.player_y_abs = max(self.y_center - self.height//2 + hh, min(self.player_y_abs, self.y_center + self.height//2 - hh))
+                if self.timestop_timer == 0:
+                    self.timestop = False
+                    self.recentrer = True
             
     def draw(self):
-        pyxel.cls(0)
         if self.on_menu:
-            return
-        
-        
-        self.world.place_map(self.x_center, self.y_center, self)
-        self.player.draw(self)
-        self.place_mobs()
-        self.place_projectiles()
-
-        if self.timestop:
-            pyxel.colors[:] = self.palette_timestop
+            pyxel.cls(0)
+            pyxel.mouse(True)
+            pyxel.rect(224,116,64,32,7)
+            pyxel.text(250, 132, 'Start', 0)
+        elif self.player.is_dead():
+            pyxel.cls(0)
+            pyxel.text(224, 100, 'You Died', 7)
+            pyxel.rect(224,116,64,32,7)
         else:
-            pyxel.colors[:] = self.palette_normal    
-        if self.inventory.on_screen:
-            self.inventory.afficher(self)
-            self.inventory.over_item(self)
+            pyxel.cls(0)
+            if self.on_menu:
+                return
+            
+            self.world.place_map(self.x_center, self.y_center, self)
+            self.player.draw(self)
+            self.place_mobs()
+            self.place_projectiles()
+
+            if self.timestop:
+                pyxel.colors[:] = self.palette_timestop
+            else:
+                pyxel.colors[:] = self.palette_normal    
+            if self.inventory.on_screen:
+                self.inventory.afficher(self)
+                self.inventory.over_item(self)
+            if self.debug_hitbox:
+                self.draw_debug_hitboxes()
 
     def place_mobs(self):
         for i in self.mobs:
@@ -133,15 +182,78 @@ class App:
     def place_projectiles(self):
         for i in self.projectiles:
             i.draw(self)
-            i.move()
+            if not self.timestop:
+                i.move()
             for j in self.mobs:
                 if i.collision_mob(j):
                     damage = self.calcul_degats(self.inventory.items["arme"], i)
                     j.prendre_degats(damage)
+                    j.appliquer_knockback(self, i.x, i.y, force=self.RANGED_KNOCKBACK_FORCE)
                     j.is_dead(self)
                     if i in self.projectiles:
                         self.projectiles.remove(i)
                     break
+
+    def orient_player_to_mouse(self):
+        player_center_x = self.screen_center_x + (self.player_x_abs - self.x_center)
+        player_center_y = self.screen_center_y + (self.player_y_abs - self.y_center)
+        dx = pyxel.mouse_x - player_center_x
+        dy = pyxel.mouse_y - player_center_y
+        if abs(dx) >= abs(dy):
+            self.player.direction = "right" if dx >= 0 else "left"
+        else:
+            self.player.direction = "down" if dy >= 0 else "up"
+
+    def get_melee_hitboxes(self):
+        slash_range = self.SLASH_RANGE
+        player_box = (
+            self.player_x_abs - self.player.width // 2,
+            self.player_y_abs - self.player.height // 2,
+            self.player.width,
+            self.player.height,
+        )
+        if self.player.direction == 'up':
+            slash_box = (player_box[0], player_box[1] - slash_range, player_box[2], slash_range)
+        elif self.player.direction == 'down':
+            slash_box = (player_box[0], player_box[1] + player_box[3], player_box[2], slash_range)
+        elif self.player.direction == 'left':
+            slash_box = (player_box[0] - slash_range, player_box[1], slash_range, player_box[3])
+        else:  # right
+            slash_box = (player_box[0] + player_box[2], player_box[1], slash_range, player_box[3])
+        return player_box, slash_box
+
+    def player_slash(self):
+        player_box, slash_box = self.get_melee_hitboxes()
+        for j in self.mobs:
+            mob_box = (j.x - j.width // 2, j.y - j.height // 2, j.width, j.height)
+            hit_by_slash = j.collision_rect(
+                slash_box[0], slash_box[1], slash_box[2], slash_box[3],
+                mob_box[0], mob_box[1], mob_box[2], mob_box[3]
+            )
+            hit_by_contact = j.collision_rect(
+                player_box[0], player_box[1], player_box[2], player_box[3],
+                mob_box[0], mob_box[1], mob_box[2], mob_box[3]
+            )
+            if hit_by_slash or hit_by_contact:
+                damage = self.calcul_degats(self.inventory.items["arme"])
+                j.prendre_degats(damage)
+                j.appliquer_knockback(self, self.player_x_abs, self.player_y_abs, force=self.MELEE_KNOCKBACK_FORCE)
+                j.is_dead(self) 
+
+    def draw_debug_hitboxes(self):
+        for mob in self.mobs:
+            mx = int(self.screen_center_x + (mob.x - self.x_center) - mob.width // 2)
+            my = int(self.screen_center_y + (mob.y - self.y_center) - mob.height // 2)
+            pyxel.rectb(mx, my, mob.width, mob.height, 8)
+
+        player_box, slash_box = self.get_melee_hitboxes()
+        px = int(self.screen_center_x + (player_box[0] - self.x_center))
+        py = int(self.screen_center_y + (player_box[1] - self.y_center))
+        pyxel.rectb(px, py, int(player_box[2]), int(player_box[3]), 11)
+
+        sx = int(self.screen_center_x + (slash_box[0] - self.x_center))
+        sy = int(self.screen_center_y + (slash_box[1] - self.y_center))
+        pyxel.rectb(sx, sy, int(slash_box[2]), int(slash_box[3]), 10)
 
     def load_walls(self):
         self.obstacle = []
@@ -151,6 +263,7 @@ class App:
                 
                 if pyxel.tilemaps[self.world.tm].pget(x // 8, y // 8) in self.elt_col:
                     self.obstacle.append((x//8, y//8))
+
     def calcul_degats(self, item, arrow = None):
         base_damage = self.player.base_damage + item.liste_attributs.get("damage", 0)
         crit_chance_bonus = item.liste_attributs.get("crit_chance_bonus", 0)
@@ -165,4 +278,3 @@ class App:
             return base_damage * crit_multiplier
         else:
             return base_damage
-        
