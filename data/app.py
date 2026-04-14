@@ -38,13 +38,13 @@ class App:
         self.screen_center_y = self.height // 2
         self.correspondance_nom = {"damage" : "DMG", "crit_chance_bonus" : "CRIT CHANCE", "crit_multiplier_bonus" : "CRIT MULTIPLIER", "attack_speed_bonus" : "ATK SPEED", "defense" : "DEF", "bonus_health" : "HP", "range" : "RANGE"}
         self.palette_normal = [
-            0x0D0D0D, 0x1D2B53, 0x7E2553, 0x008751,
+            0x0D0D0D, 0x1D2B53, 0x7E2553, 0x609266,
             0xAB5236, 0x1E8C0A, 0xC2C3C7, 0xFFF1E8,  
             0xFF004D, 0xFFA300, 0xFFEC27, 0x00E436,
-            0x3DDB1A, 0x83769C, 0xFF77A8, 0xFFCCAA   
+            0x4ba344, 0x83769C, 0xFF77A8, 0xFFCCAA   
         ]
 
-
+        pyxel.colors[:] = self.palette_normal  
         self.palette_timestop = [
             0x0D0D0D, 0x1D2B53, 0x7E2553, 0x008751,
             0xAB5236, 0x555555, 0xC2C3C7, 0xFFF1E8,  
@@ -88,6 +88,10 @@ class App:
         self.projectiles.append(Arrow(self.player_x_abs, self.player_y_abs - self.player.height//4, a[type][subtype][1], rotation, (xr/hr, yr/hr), a[type][subtype][0], subtype))
 
     def update(self):
+        if self.timestop:
+            self.player.colkey = 3
+        else:
+            self.player.colkey = 5
         if self.on_menu:
             if (224<pyxel.mouse_x<288 and 116<pyxel.mouse_y<148 and pyxel.btnr(pyxel.MOUSE_BUTTON_LEFT)) or pyxel.btnr(pyxel.KEY_SPACE):
                 self.on_menu=False

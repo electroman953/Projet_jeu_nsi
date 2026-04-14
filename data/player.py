@@ -19,6 +19,7 @@ class Player:
         self.base_critical_multiplier = 1.5
         self.base_attack_speed = 1
         self.level = 1
+        self.colkey = 5
         self.experience = 0
 
     def deplace(self, app):
@@ -133,17 +134,7 @@ class Player:
                 self.next_anim_attaque = 3
                 self.en_attaque -= 1
         attack_animation_frame = 8 - self.en_attaque
-        """
-        Coordonnées attack 2
-        taille down : 55, 47
-        commence en 0, 0
-        taille left : 63, 31
-        commence en 0, 96
-        taille right : 55, 39
-        commence en 0, 0
-        taille up : 55, 39
-        commence en 0, 80
-        """
+        
         if self.run:
             pyxel.images[0].load(0, 0, "../Textures/Perso/run.png")
         elif self.en_attaque > 0 and self.direction in ["down", "left"]:
@@ -154,29 +145,29 @@ class Player:
             pyxel.images[0].load(0, 0, "../Textures/Perso/idle.png")
         if self.direction == "up":
             if self.run:
-                pyxel.blt(self.player_screen_x, self.player_screen_y, 0, 24 * run_animation_frame, 96, 23, 31, 3)
+                pyxel.blt(self.player_screen_x, self.player_screen_y, 0, 24 * run_animation_frame, 96, 23, 31, self.colkey)
             elif self.en_attaque > 0:
-                pyxel.blt(self.player_screen_x - 17, self.player_screen_y - 4, 0, 56 * (attack_animation_frame % 4), 80 + (40 * (attack_animation_frame // 4)), 56, 40, 3)
+                pyxel.blt(self.player_screen_x - 17, self.player_screen_y - 4, 0, 56 * (attack_animation_frame % 4), 80 + (40 * (attack_animation_frame // 4)), 56, 40, self.colkey)
             else:
-                pyxel.blt(self.player_screen_x, self.player_screen_y, 0, 24 * idle_animation_frame, 120, 23, 39, 3)
+                pyxel.blt(self.player_screen_x, self.player_screen_y, 0, 24 * idle_animation_frame, 120, 23, 39, self.colkey)
         elif self.direction == "down":
             if self.run:
-                pyxel.blt(self.player_screen_x, self.player_screen_y, 0, 24 * run_animation_frame, 0, 23, 31, 3)
+                pyxel.blt(self.player_screen_x, self.player_screen_y, 0, 24 * run_animation_frame, 0, 23, 31, self.colkey)
             elif self.en_attaque > 0:
-                pyxel.blt(self.player_screen_x - 16, self.player_screen_y, 0, 56 * (attack_animation_frame % 4), 0 + (48 * (attack_animation_frame // 4)), 56, 48, 3)
+                pyxel.blt(self.player_screen_x - 16, self.player_screen_y, 0, 56 * (attack_animation_frame % 4), 0 + (48 * (attack_animation_frame // 4)), 56, 48, self.colkey)
             else:
-                pyxel.blt(self.player_screen_x, self.player_screen_y, 0, 24 * idle_animation_frame, 0, 23, 39, 3)
+                pyxel.blt(self.player_screen_x, self.player_screen_y, 0, 24 * idle_animation_frame, 0, 23, 39, self.colkey)
         elif self.direction == "left":
             if self.run:
-                pyxel.blt(self.player_screen_x, self.player_screen_y, 0, 24 * run_animation_frame, 32, 23, 31, 3)
+                pyxel.blt(self.player_screen_x, self.player_screen_y, 0, 24 * run_animation_frame, 32, 23, 31, self.colkey)
             elif self.en_attaque > 0:
-                pyxel.blt(self.player_screen_x - 20, self.player_screen_y, 0, 64 * (attack_animation_frame % 4), 96 + (32 * (attack_animation_frame // 4)), 64, 32, 3)
+                pyxel.blt(self.player_screen_x - 20, self.player_screen_y, 0, 64 * (attack_animation_frame % 4), 96 + (32 * (attack_animation_frame // 4)), 64, 32, self.colkey)
             else:
-                pyxel.blt(self.player_screen_x, self.player_screen_y, 0, 24 * idle_animation_frame, 40, 23, 39, 3)
+                pyxel.blt(self.player_screen_x, self.player_screen_y, 0, 24 * idle_animation_frame, 40, 23, 39, self.colkey)
         elif self.direction == "right":
             if self.run:
-                pyxel.blt(self.player_screen_x, self.player_screen_y, 0, 24 * run_animation_frame, 64, 23, 31, 3)
+                pyxel.blt(self.player_screen_x, self.player_screen_y, 0, 24 * run_animation_frame, 64, 23, 31, self.colkey)
             elif self.en_attaque > 0:
-                pyxel.blt(self.player_screen_x - 14, self.player_screen_y, 0, 56 * (attack_animation_frame % 4), 0 + (40 * (attack_animation_frame // 4)), 56, 40, 3)
+                pyxel.blt(self.player_screen_x - 14, self.player_screen_y, 0, 56 * (attack_animation_frame % 4), 0 + (40 * (attack_animation_frame // 4)), 56, 40, self.colkey)
             else:
-                pyxel.blt(self.player_screen_x, self.player_screen_y, 0, 24 * idle_animation_frame, 80, 23, 39, 3)
+                pyxel.blt(self.player_screen_x, self.player_screen_y, 0, 24 * idle_animation_frame, 80, 23, 39, self.colkey)
