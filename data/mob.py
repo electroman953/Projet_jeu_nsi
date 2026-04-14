@@ -13,13 +13,14 @@ class Mob:
         self.color = c
         self.vitesse = 1
         self.chemin  = []
+        
         self.xp_drop_range = xp_drop_range
         self.loot_table = loot_table if loot_table is not None else []
         self.timer = 0
         self.detection_range = 200
     def draw(self, app):
-        self.screen_x = app.screen_center_x + (self.x - app.x_center)
-        self.screen_y = app.screen_center_y + (self.y - app.y_center)
+        self.screen_x = app.screen_center_x + (self.x - app.x_center) - self.width // 2
+        self.screen_y = app.screen_center_y + (self.y - app.y_center) - self.height // 2
         pyxel.rect(self.screen_x, self.screen_y, self.width, self.height, self.color)
         #pyxel.blt(self.x, self.y, 0, 0, 0, 16, 16)
     def move(self, app, player_x, player_y):
@@ -37,32 +38,88 @@ class Mob:
             self.chemin = app.world.parcours_largeur(debut, fin, app)
         if self.chemin:
             next_cell = self.chemin[0]
-            next_x = next_cell[0]*8 + 4
-            next_y = next_cell[1]*8 + 4
+            next_x = next_cell[0] * 8 + 4
+            next_y = next_cell[1] * 8 + 4
             dx = next_x - self.x
             dy = next_y - self.y
             if abs(dx) > self.vitesse:
                 dx = self.vitesse if dx > 0 else -self.vitesse
-            elif abs(dx) > 0:
-                dx = dx
             if abs(dy) > self.vitesse:
                 dy = self.vitesse if dy > 0 else -self.vitesse
-            elif abs(dy) > 0:
-                dy = dy
-            self.x += dx
-            self.y += dy
+
+            if dx != 0 or dy != 0:
+                hit_player = self.next_dest_is_player(app, dx, dy)
+                if hit_player:
+                    app.player.take_damage(app, self.damage)
+                elif not self.next_dest_is_obstacle(app, dx, dy):
+                    self.x += dx
+                    self.y += dy
+                else:
+                    if dx != 0:
+                        if self.next_dest_is_player(app, dx, 0):
+                            hit_player = True
+                        elif not self.next_dest_is_obstacle(app, dx, 0):
+                            self.x += dx
+                    if dy != 0:
+                        if self.next_dest_is_player(app, 0, dy):
+                            hit_player = True
+                        elif not self.next_dest_is_obstacle(app, 0, dy):
+                            self.y += dy
+                    if hit_player:
+                        app.player.take_damage(self.damage)
+
             if self.x == next_x and self.y == next_y:
                 self.chemin.pop(0)
-            
     def collision_rect(self, x1, y1, w1, h1, x2, y2, w2, h2):
         return (x1 < x2 + w2 and
                 x1 + w1 > x2 and
                 y1 < y2 + h2 and
                 y1 + h1 > y2)
     def prendre_degats(self, damage):
+        print(f"Mob took {damage} damage")
         self.health -= damage
         if self.health <= 0:
             self.health = 0
+
+    def appliquer_knockback(self, app, source_x, source_y, force=20):
+        if self.health <= 0 or force <= 0:
+            return
+        dx = self.x - source_x
+        dy = self.y - source_y
+        distance = pyxel.sqrt(dx**2 + dy**2)
+        if distance == 0:
+            dx, dy = 1, 0
+            distance = 1
+        total_x = (dx / distance) * force
+        total_y = (dy / distance) * force
+        steps = max(1, int(force * 2))
+        step_x = total_x / steps
+        step_y = total_y / steps
+        acc_x = 0
+        acc_y = 0
+        for _ in range(steps):
+            acc_x += step_x
+            acc_y += step_y
+            move_x = 0
+            move_y = 0
+            if abs(acc_x) >= 1:
+                move_x = 1 if acc_x > 0 else -1
+                acc_x -= move_x
+            if abs(acc_y) >= 1:
+                move_y = 1 if acc_y > 0 else -1
+                acc_y -= move_y
+            if move_x == 0 and move_y == 0:
+                continue
+            if move_x != 0 and not self.next_dest_is_obstacle(app, move_x, 0):
+                self.x += move_x
+            if move_y != 0 and not self.next_dest_is_obstacle(app, 0, move_y):
+                self.y += move_y
+
+            self.x = max(self.width // 2, min(self.x, app.world.word_width - self.width // 2))
+            self.y = max(self.height // 2, min(self.y, app.world.word_height - self.height // 2))
+
+        self.chemin = []
+
     def is_dead(self, app):
         if self.health == 0:
             xp_drop = pyxel.rndi(self.xp_drop_range[0], self.xp_drop_range[1])
@@ -72,7 +129,16 @@ class Mob:
                 if pyxel.rndf() < item["drop_chance"]:
                     app.inventory.add_item(item["item"])
             app.mobs.remove(self)
-            
+
+    def next_dest_is_player(self, app, dx, dy):
+        next_x = self.x - self.width // 2 + dx
+        next_y = self.y - self.height // 2 + dy
+        player_x = app.player_x_abs - app.player.width // 2
+        player_y = app.player_y_abs - app.player.height // 2
+        if self.collision_rect(next_x, next_y, self.width, self.height,
+                                player_x, player_y, app.player.width, app.player.height):
+            return True
+        return False
 
     def next_dest_is_obstacle(self, app, dx, dy):
         next_x = self.x - self.width//2 + dx

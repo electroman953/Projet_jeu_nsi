@@ -3,23 +3,22 @@ import pyxel
 class Player:
 
     def __init__(self):
-        self.speed = 2*pyxel.sqrt(2)
+        self.speed = 2 * pyxel.sqrt(2)
         self.width = 19
         self.height = 34
         self.direction = "down"
         self.run = False
         self.en_attaque = False
         
-        
-        
         self.base_damage = 10
         self.base_health = 100
+        self.health = self.base_health
+        self.base_defense = 0
         self.base_critical_chance = 0.1
         self.base_critical_multiplier = 1.5
         self.base_attack_speed = 1
         self.level = 1
         self.experience = 0
-        
 
     def deplace(self, app):
         #coordonnées du joueur relatif à l'écran
@@ -81,13 +80,13 @@ class Player:
 
     def check_key(self, app):
         if pyxel.btnp(pyxel.KEY_SPACE):
-            if app.timestop == False and app.timestop_cooldown == 0:
-                app.timestop = True
-                app.timestop_timer = app.TIMESTOP_DURATION
-            else:
+            if app.timestop:
                 app.timestop = False
                 app.recentrer = True
                 app.timestop_cooldown = app.TIMESTOP_COOLDOWN
+            elif app.timestop_cooldown == 0:
+                app.timestop = True
+                app.timestop_timer = app.TIMESTOP_DURATION
         if pyxel.btnp(pyxel.KEY_R):
             print(app.inventory.récuperer_case_souris())
         if pyxel.btnp(pyxel.KEY_I):
@@ -100,6 +99,19 @@ class Player:
                 x1 + w1 > x2 and
                 y1 < y2 + h2 and
                 y1 + h1 > y2)
+    
+    def take_damage(self, app, n):
+        if app.i_frames==0:
+            print('AIE')
+            self.health=max(0,self.health-n)
+            app.i_frames = app.invincible_timer
+        
+    def regen(self, app, n):
+        self.health=min(self.base_health, self.health+n)
+
+    def is_dead(self):
+        return self.health==0
+
     def next_dest_is_obstacle(self, app, dx, dy):
         next_x = app.player_x_abs - self.width//2 + dx
         next_y = app.player_y_abs - self.height//2 + dy
@@ -114,6 +126,17 @@ class Player:
         self.player_screen_y = app.screen_center_y + (app.player_y_abs - app.y_center) - self.height//2
         idle_animation_frame = (pyxel.frame_count // 10) % 8
         run_animation_frame = (pyxel.frame_count // 5) % 8
+        """
+        Coordonnées attack 2
+        taille down : 55, 47
+        commence en 0, 0
+        taille left : 63, 31
+        commence en 0, 96
+        taille right : 55, 39
+        commence en 0, 0
+        taille up : 55, 39
+        commence en 0, 80
+        """
         if self.run:
             pyxel.images[0].load(0, 0, "../Textures/Perso/run.png")
         else:
