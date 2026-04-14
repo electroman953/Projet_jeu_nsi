@@ -163,7 +163,7 @@ class Player:
             if self.run:
                 pyxel.blt(self.player_screen_x, self.player_screen_y, 0, 24 * run_animation_frame, 0, 23, 31, 3)
             elif self.en_attaque > 0:
-                pyxel.blt(self.player_screen_x - 14, self.player_screen_y, 0, 56 * (attack_animation_frame % 4), 0 + (48 * (attack_animation_frame // 4)), 56, 48, 3)
+                pyxel.blt(self.player_screen_x - 16, self.player_screen_y, 0, 56 * (attack_animation_frame % 4), 0 + (48 * (attack_animation_frame // 4)), 56, 48, 3)
             else:
                 pyxel.blt(self.player_screen_x, self.player_screen_y, 0, 24 * idle_animation_frame, 0, 23, 39, 3)
         elif self.direction == "left":
