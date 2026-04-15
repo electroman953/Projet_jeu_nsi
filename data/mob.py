@@ -12,7 +12,7 @@ class Mob:
         self.color = c
         self.vitesse = 1
         self.chemin  = []
-        
+        self.timer = pyxel.rndi(0, 29)
         self.knockback_vx = 0
         self.knockback_vy = 0
         
