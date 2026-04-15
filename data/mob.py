@@ -40,9 +40,8 @@ class Mob:
             if move_y != 0 and not self.next_dest_is_obstacle(app, 0, move_y):
                 self.y += move_y
                 
-            if hasattr(app.world, 'word_width'):
-                self.x = max(self.width // 2, min(self.x, app.world.word_width - self.width // 2))
-                self.y = max(self.height // 2, min(self.y, app.world.word_height - self.height // 2))
+            self.x = max(self.width // 2, min(self.x, app.world.word_width - self.width // 2))
+            self.y = max(self.height // 2, min(self.y, app.world.word_height - self.height // 2))
 
             self.knockback_vx *= 0.8
             self.knockback_vy *= 0.8

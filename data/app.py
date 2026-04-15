@@ -33,7 +33,7 @@ class App:
         self.i_frames = 0
         self.width = 512
         self.height = 256
-        self.elt_col = [(16, 21), (16, 22), (16, 23), (16, 24), (16, 25), (16, 26), (16, 27), (17, 21), (17, 22), (17, 23), (17, 24), (17, 25), (17, 26), (17, 27), (18, 21), (18, 22), (18, 23), (18, 24), (18, 25), (18, 26), (18, 27), (19, 21), (19, 22), (19, 23), (19, 24), (19, 25), (19, 26), (19, 27), (20, 21), (20, 22), (20, 23), (20, 24), (20, 25), (20, 26), (20, 27), (21, 21), (21, 22), (21, 23), (21, 24), (21, 25), (21, 26), (21, 27)]
+        self.elt_col = []
         self.screen_center_x = self.width // 2
         self.screen_center_y = self.height // 2
         self.correspondance_nom = {"damage" : "DMG", "crit_chance_bonus" : "CRIT CHANCE", "crit_multiplier_bonus" : "CRIT MULTIPLIER", "attack_speed_bonus" : "ATK SPEED", "defense" : "DEF", "bonus_health" : "HP"}
@@ -101,7 +101,11 @@ class App:
             30: ("armor", "Armure légendaire",   "Le summum de l'artisanat, portée par les héros des âges anciens.",       64, 224, 22, {"bonus_health": 40}),
         }
 
-        self.x_center, self.y_center = self.screen_center_x, self.screen_center_y
+        # Coordonnées de spawn modifiables
+        self.spawn_x = 8 * 38
+        self.spawn_y = 9 * 41
+
+        self.x_center, self.y_center = self.spawn_x, self.spawn_y
 
         self.projectiles = []
         self.mobs = [
@@ -111,12 +115,11 @@ class App:
         self.create_mobs()
         self.inventory = Inventory(self)
         self.player = Player()
-        self.player_x_abs,self.player_y_abs = self.x_center, self.y_center
-        self.world = World(self.width, self.height,2)
+        self.player_x_abs, self.player_y_abs = self.spawn_x, self.spawn_y
+        self.world = World(self.width, self.height,0)
         self.recentrer = False
         self.obstacle = []
         self.debug_hitbox = True
-
 
     def create_mobs(self):
         temp = []
