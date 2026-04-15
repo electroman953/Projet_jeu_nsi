@@ -141,6 +141,7 @@ class App:
         self.projectiles.append(Arrow(self.player_x_abs, self.player_y_abs - self.player.height//4, a[type][subtype][1], rotation, (xr/hr, yr/hr), a[type][subtype][0], subtype))
 
     def update(self):
+        self.player.level_up(self)
         if self.timestop:
             self.player.colkey = 3
         else:
@@ -346,3 +347,4 @@ class App:
         else:
             pyxel.text(10,20,f"Timestop is ready", 7)
         pyxel.text(10,30,f"XP: {self.player.experience}", 7)
+        pyxel.text(10,40,f"Level: {self.player.level}", 7)

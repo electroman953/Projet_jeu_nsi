@@ -21,7 +21,9 @@ class Player:
         self.level = 1
         self.colkey = 5
         self.experience = 0
+        self.experience_to_next_level = 40
         self.s_dmg = 0
+        self.level = 1
 
     def deplace(self, app):
         #coordonnées du joueur relatif à l'écran
@@ -124,6 +126,17 @@ class Player:
                 return True
         return False
     
+    def level_up(self, app):
+        if self.experience >= self.experience_to_next_level:
+            self.level += 1
+            self.experience -= self.experience_to_next_level
+            self.experience_to_next_level = int(self.experience_to_next_level * 1.3)
+            self.base_health += 20
+            self.health = min (self.health + 30, self.base_health)
+            self.base_damage += 5
+            self.base_defense += 2
+            self.base_critical_chance += 0.05
+            self.base_critical_multiplier += 0.2
     def draw(self, app):
         #coordonnées du joueur relatif à l'écran
         self.player_screen_x = app.screen_center_x + (app.player_x_abs - app.x_center) - self.width//2
