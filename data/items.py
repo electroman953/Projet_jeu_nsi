@@ -65,8 +65,6 @@ class bow(Weapon):
         if app.bow_cooldown <= 0:
             app.add_player_projectile("arrow", "basic")
             app.bow_cooldown = app.BOW_COOLDOWN - self.liste_attributs["attack_speed_bonus"]
-            app.player.en_attaque = 8
-            app.player.next_anim_attaque = 3
 
 class staff(Weapon):
     def __init__(self, name, description, image_x, image_y, damage, crit_chance_bonus=0.05, crit_multiplier_bonus=0.5, attack_speed_bonus=0.2):

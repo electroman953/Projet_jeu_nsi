@@ -21,6 +21,7 @@ class Player:
         self.level = 1
         self.colkey = 5
         self.experience = 0
+        self.s_dmg = 0
 
     def deplace(self, app):
         #coordonnées du joueur relatif à l'écran
@@ -105,6 +106,7 @@ class Player:
     def take_damage(self, app, n):
         if app.i_frames==0:
             print('AIE')
+            self.s_dmg=0.1
             self.health=max(0,self.health-n)
             app.i_frames = app.invincible_timer
         
@@ -116,9 +118,9 @@ class Player:
 
     def next_dest_is_obstacle(self, app, dx, dy):
         next_x = app.player_x_abs - self.width//2 + dx
-        next_y = app.player_y_abs - self.height//2 + dy
+        next_y = app.player_y_abs  + dy
         for obs in app.obstacle:
-            if self.collision_rect(next_x, next_y, self.width, self.height, obs[0]*8, obs[1]*8, 8, 8):
+            if self.collision_rect(next_x, next_y, self.width, self.height//2, obs[0]*8, obs[1]*8, 8, 8):
                 return True
         return False
     
@@ -171,3 +173,10 @@ class Player:
                 pyxel.blt(self.player_screen_x - 14, self.player_screen_y, 0, 56 * (attack_animation_frame % 4), 0 + (40 * (attack_animation_frame // 4)), 56, 40, self.colkey)
             else:
                 pyxel.blt(self.player_screen_x, self.player_screen_y, 0, 24 * idle_animation_frame, 80, 23, 39, self.colkey)
+    
+    def show_dmg(self,app):
+        if self.s_dmg>0:
+            for i in range(int(25-self.health/5)):
+                pyxel.rectb(i,i,app.width-i*2,app.height-i*2,8)
+            if pyxel.frame_count%6==0:
+                self.s_dmg = max(0,self.s_dmg-0.1)

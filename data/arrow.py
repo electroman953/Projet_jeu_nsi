@@ -1,7 +1,7 @@
 import pyxel
 
 class Arrow:
-    def __init__(self, x, y, damage, rotation, direction = (1, 1), speed=3, type="basic", damage_multiplier=1, crit_chance_bonus=0, crit_multiplier_bonus=0):
+    def __init__(self, x, y, damage, rotation, direction = (1, 1), speed=8, type="basic", damage_multiplier=1, crit_chance_bonus=0, crit_multiplier_bonus=0):
         self.x = x
         self.y = y
         self.damage = damage

@@ -33,7 +33,7 @@ class App:
         self.i_frames = 0
         self.width = 512
         self.height = 256
-        self.elt_col = []
+        self.elt_col = [(21, 1), (21, 2), (21, 3), (21, 4), (21, 5), (21, 6), (21, 7), (21, 8), (21, 9), (21, 10), (22, 1), (22, 2), (22, 3), (22, 4), (22, 5), (22, 6), (22, 7), (22, 8), (22, 9), (22, 10), (21, 13), (21, 14), (22, 13), (22, 14), (1, 17), (1, 18), (2, 17), (2, 18), (3, 17), (3, 18), (4, 17), (4, 18), (5, 17), (5, 18), (6, 17), (6, 18), (7, 17), (7, 18), (8, 17), (8, 18), (9, 17), (9, 18), (10, 17), (10, 18), (12, 16), (12, 17), (12, 18), (12, 19), (13, 16), (13, 17), (13, 18), (13, 19), (14, 16), (14, 17), (14, 18), (14, 19), (15, 16), (15, 17), (15, 18), (15, 19), (16, 4), (16, 5), (16, 6), (16, 7), (16, 8), (16, 9), (17, 4), (17, 5), (17, 6), (17, 7), (17, 8), (17, 9), (18, 4), (18, 5), (18, 6), (18, 7), (18, 8), (18, 9), (19, 4), (19, 5), (19, 6), (19, 7), (19, 8), (19, 9)]
         self.screen_center_x = self.width // 2
         self.screen_center_y = self.height // 2
         self.correspondance_nom = {"damage" : "DMG", "crit_chance_bonus" : "CRIT CHANCE", "crit_multiplier_bonus" : "CRIT MULTIPLIER", "attack_speed_bonus" : "ATK SPEED", "defense" : "DEF", "bonus_health" : "HP"}
@@ -130,7 +130,7 @@ class App:
         self.mobs = temp
 
     def add_player_projectile(self, type, subtype):
-        a={"arrow":{"basic":(3,5)}}
+        a={"arrow":{"basic":(8,5)}}
         self.orient_player_to_mouse()
         xr = pyxel.mouse_x - (self.player.player_screen_x + self.player.width // 2)
         yr = pyxel.mouse_y - (self.player.player_screen_y + self.player.width // 2)
@@ -220,7 +220,8 @@ class App:
             self.player.draw(self)
             self.place_mobs()
             self.place_projectiles()
-
+            self.draw_hud()
+            self.player.show_dmg(self)
             if self.timestop:
                 pyxel.colors[:] = self.palette_timestop
             else:
@@ -335,3 +336,13 @@ class App:
             return base_damage * crit_multiplier
         else:
             return base_damage
+    
+    def draw_hud(self):
+        pyxel.text(10,10,f"Health :{self.player.health}", 7)
+        if self.timestop_cooldown>0:
+            pyxel.text(10,20,f"Timestop ready in: {self.timestop_cooldown}s", 7)
+        elif self.timestop:
+            pyxel.text(10,20,f"Timestop left: {self.timestop_timer}s", 7)
+        else:
+            pyxel.text(10,20,f"Timestop is ready", 7)
+        pyxel.text(10,30,f"XP: {self.player.experience}", 7)
