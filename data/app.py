@@ -38,9 +38,9 @@ class App:
         self.screen_center_y = self.height // 2
         self.correspondance_nom = {"damage" : "DMG", "crit_chance_bonus" : "CRIT CHANCE", "crit_multiplier_bonus" : "CRIT MULTIPLIER", "attack_speed_bonus" : "ATK SPEED", "defense" : "DEF", "bonus_health" : "HP"}
         self.palette_normal = [
-            0x0D0D0D, 0x1D2B53, 0x7E2553, 0x609266,
+            0x0D0D0D, 0x1D2B53, 0x7E2553, 0x1e5925,
             0xAB5236, 0x1E8C0A, 0xC2C3C7, 0xFFF1E8,  
-            0xFF004D, 0xFFA300, 0xFFEC27, 0x00E436,
+            0xFF004D, 0xFFA300, 0xFFEC27, 0x64b0e6,
             0x4ba344, 0x83769C, 0xFF77A8, 0xFFCCAA   
         ]
 

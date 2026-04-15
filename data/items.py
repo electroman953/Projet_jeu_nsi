@@ -21,7 +21,11 @@ class Item:
         if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT) and actif:
             app.orient_player_to_mouse()
             self.attack(app)
-
+class Potion(Item):
+    def __init__(self, name, description, image_x, image_y, heal_amount):
+        super().__init__(name, description, image_x, image_y)
+        self.type = "potion"
+        self.liste_attributs["heal_amount"] = heal_amount
 class Weapon(Item):
     def __init__(self, name, description, image_x, image_y, damage, crit_chance_bonus=0, crit_multiplier_bonus=0, attack_speed_bonus=0):
         super().__init__(name, description, image_x, image_y)
