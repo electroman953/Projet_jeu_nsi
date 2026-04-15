@@ -14,7 +14,6 @@ class Inventory:
 
     def open(self, app):
         self.on_screen = not self.on_screen
-        app.timestop = self.on_screen
         pyxel.mouse(self.on_screen)
         if self.on_screen:
             self.items[self.old_drag_case] = self.dragging_item

@@ -240,7 +240,7 @@ class App:
     def place_projectiles(self):
         for i in self.projectiles:
             i.draw(self)
-            if not self.timestop:
+            if not self.timestop and not self.inventory.on_screen:
                 i.move()
             for j in self.mobs:
                 if i.collision_mob(j):

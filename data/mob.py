@@ -30,6 +30,8 @@ class Mob:
             return
         if app.timestop:
             return
+        if app.inventory.on_screen:
+            return
             
         if abs(self.knockback_vx) > 0.1 or abs(self.knockback_vy) > 0.1:
             move_x = int(self.knockback_vx)
