@@ -19,7 +19,7 @@ class Mob:
         self.xp_drop_range = xp_drop_range
         self.loot_table = loot_table if loot_table is not None else []
         self.timer = 0
-        self.detection_range = 200
+        self.detection_range = 400
     def draw(self, app):
         self.screen_x = app.screen_center_x + (self.x - app.x_center) - self.width // 2
         self.screen_y = app.screen_center_y + (self.y - app.y_center) - self.height // 2
@@ -91,7 +91,7 @@ class Mob:
                     if hit_player:
                         app.player.take_damage(self.damage)
 
-            if self.x == next_x and self.y == next_y:
+            if abs(self.x - next_x) <= self.vitesse and abs(self.y - next_y) <= self.vitesse:
                 self.chemin.pop(0)
     def collision_rect(self, x1, y1, w1, h1, x2, y2, w2, h2):
         return (x1 < x2 + w2 and

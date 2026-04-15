@@ -94,6 +94,12 @@ class World:
             app.recentrer = False
     def parcours_largeur(self, debut, fin, app):
         obstacles = [(i, j) for i, j in app.obstacle]
+        # Ajouter une zone de sécurité autour des obstacles pour que les ennemis avec une hitbox plus large puissent passer sans bloquer
+        expanded_obstacles = set(obstacles)
+        for obs in obstacles:
+            for dx, dy in [(1,0), (-1,0), (0,1), (0,-1), (1,1), (-1,-1), (1,-1), (-1,1)]:
+                expanded_obstacles.add((obs[0]+dx, obs[1]+dy))
+
         queue = [debut]
         viens_de = {debut: None}
         while queue:
@@ -110,12 +116,14 @@ class World:
                 if not (0 <= voisin[0] < self.word_width and 0 <= voisin[1] < self.word_height):
                     continue
                 if dx != 0 and dy != 0:
-                    if (actuel[0] + dx, actuel[1]) in obstacles or (actuel[0], actuel[1] + dy) in obstacles:
+                    if (actuel[0] + dx, actuel[1]) in expanded_obstacles or (actuel[0], actuel[1] + dy) in expanded_obstacles:
                         continue
-                if voisin in obstacles or voisin in viens_de:  
+                # Autoriser la fin même si elle est dans un obstacle "étendu" pour éviter de ne pas trouver de chemin
+                if voisin != fin and (voisin in expanded_obstacles or voisin in viens_de):  
+                    continue
+                if voisin == fin and voisin in viens_de:
                     continue
                 viens_de[voisin] = actuel
                 queue.append(voisin)
 
         return []
-    
