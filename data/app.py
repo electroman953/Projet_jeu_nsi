@@ -7,6 +7,7 @@ from data.mob import Mob
 from data.arrow import Arrow
 from data.coffre import Coffre
 from data.zone import Zone
+from Textures.menu import Menu
 
 class App:
     
@@ -19,6 +20,13 @@ class App:
 
     def start(self):
         self.on_menu = True
+        self.palette_menu = [
+            0x000000, 0xFCDED7, 0xE87C3C, 0xFF9656, 0x49D35C,
+            0x29204A, 0x563271, 0xDC576C, 0x417B1C, 0xF3A2AF, 
+            0xB8E416, 0xA7D10C, 0xF2B9A0, 0xEFAF8B, 0xCFCFCF, 
+            0xFFFFFF
+        ]
+        self.menu = Menu()
         self.timestop = False
         self.TIMESTOP_DURATION = 5
         self.TIMESTOP_COOLDOWN = 10
@@ -52,7 +60,7 @@ class App:
             0x4ba344, 0x83769C, 0xFF77A8, 0xFFCCAA   
         ]
 
-        pyxel.colors[:] = self.palette_normal  
+        pyxel.colors[:] = self.palette_menu
         self.palette_timestop = [
             0x0D0D0D, 0x1D2B53, 0x7E2553, 0x008751,
             0xAB5236, 0x555555, 0xC2C3C7, 0xFFF1E8,  
@@ -184,6 +192,7 @@ class App:
         if self.on_menu:
             if (224<pyxel.mouse_x<288 and 116<pyxel.mouse_y<148 and pyxel.btnr(pyxel.MOUSE_BUTTON_LEFT)) or pyxel.btnr(pyxel.KEY_SPACE):
                 self.on_menu=False
+                pyxel.colors[:] = self.palette_normal
         elif self.player.is_dead():
             if (224<pyxel.mouse_x<288 and 116<pyxel.mouse_y<148 and pyxel.btnr(pyxel.MOUSE_BUTTON_LEFT)) or pyxel.btnr(pyxel.KEY_SPACE):
                 self.start()
@@ -220,7 +229,6 @@ class App:
             if self.recentrer:
                 return
             if self.on_menu:
-                
                 return
             if self.inventory.on_screen:
                 return
@@ -245,14 +253,14 @@ class App:
         if self.on_menu:
             pyxel.cls(0)
             pyxel.mouse(True)
-            pyxel.rect(224,116,64,32,7)
-            pyxel.text(250, 132, 'Start', 0)
+            self.menu.draw_menu()
         elif self.player.is_dead():
             pyxel.cls(0)
             pyxel.text(224, 100, 'You Died', 7)
             pyxel.rect(224,116,64,32,7)
         else:
             pyxel.cls(0)
+
             if self.on_menu:
                 return
             
