@@ -42,16 +42,17 @@ class App:
         self.invincible_timer = .5
         self.i_frames = 0
         self.width = 512
+        self.potion_active = []
         self.height = 256
         self.elt_col = [ (21, 1), (21, 2), (21, 3), (21, 4), (21, 5), (21, 6), (21, 7), (21, 8), (21, 9), (21, 10), (22, 1), (22, 2), (22, 3), (22, 4), (22, 5), (22, 6), (22, 7), (22, 8), (22, 9), (22, 10), (21, 13), (21, 14), (22, 13), (22, 14), (1, 17), (1, 18), (2, 17), (2, 18), (3, 17), (3, 18), (4, 17), (4, 18), (5, 17), (5, 18), (6, 17), (6, 18), (7, 17), (7, 18), (8, 17), (8, 18), (9, 17), (9, 18), (10, 17), (10, 18), (12, 16), (12, 17), (12, 18), (12, 19), (13, 16), (13, 17), (13, 18), (13, 19), (14, 16), (14, 17), (14, 18), (14, 19), (15, 16), (15, 17), (15, 18), (15, 19), (16, 4), (16, 5), (16, 6), (16, 7), (16, 8), (16, 9), (17, 4), (17, 5), (17, 6), (17, 7), (17, 8), (17, 9), (18, 4), (18, 5), (18, 6), (18, 7), (18, 8), (18, 9), (19, 4), (19, 5), (19, 6), (19, 7), (19, 8), (19, 9)]
         self.screen_center_x = self.width // 2
         self.screen_center_y = self.height // 2
         self.correspondance_nom = {"damage" : "DMG", "crit_chance_bonus" : "CRIT CHANCE", "crit_multiplier_bonus" : "CRIT MULTIPLIER", "attack_speed_bonus" : "ATK SPEED", "defense" : "DEF", "bonus_health" : "HP"}
         self.zones = [
-            Zone("Easy", ["tortue", "renard"], 1, 100, 0, 0, 1024, 1024),
-            Zone("Medium", ["renard", "chien"], 2, 0, 1024, 0, 1024, 1024),
-            Zone("Hard", [ "chien", "lion"], 3, 0, 0, 1024, 1024, 1024),
-            Zone("Boss", ["salamandre"], 4, 0, 1024, 1024,1024, 1024)
+            Zone("Easy", ["tortue", "renard"], 1, 20, 0, 0, 1024, 1024),
+            Zone("Medium", ["renard", "chien"], 2, 30, 1024, 0, 1024, 1024),
+            Zone("Hard", [ "chien", "lion"], 3, 0, 40, 1024, 1024, 1024),
+            Zone("Boss", ["salamandre"], 4, 40, 1024, 1024,1024, 1024)
         ]
         self.palette_normal = [
             0x0D0D0D, 0x1D2B53, 0x7E2553, 0x1e5925,
@@ -141,11 +142,11 @@ class App:
     def create_mobs(self, monstre, zone=None):
         temp = []
         type={
-            "tortue": {"health": 50, "damage": 20, "height": 32, "width": 32, "color": 8, "xp_drop_range": (5, 15), "loot_table": [], 'texture':(0,0)},
+            "chien": {"health": 50, "damage": 20, "height": 32, "width": 32, "color": 8, "xp_drop_range": (5, 15), "loot_table": [], 'texture':(0,0)},
             "lion":{"health": 200, "damage": 100, "height": 32, "width": 32, "color": 7, "xp_drop_range": (50,60), "loot_table": [],'texture':(0,125)},
             "renard":{"health": 100, "damage": 50, "height": 32, "width": 32, "color": 9, "xp_drop_range": (10, 20), "loot_table": [],'texture':(96,0)},
             "salamandre":{"health": 550, "damage": 150, "height": 32, "width": 32, "color": 10, "xp_drop_range": (100,150), "loot_table": [],'texture':(192,0)},
-            "chien":{"health": 80, "damage": 40, "height": 32, "width": 32, "color": 11, "xp_drop_range": (25,35), "loot_table": [],'texture':(96,128)}
+            "tortue":{"health": 80, "damage": 40, "height": 32, "width": 32, "color": 11, "xp_drop_range": (25,35), "loot_table": [],'texture':(96,128)}
             }
         if zone is not None:
             #trouve des coordonée x et y aléatoires dans la zone qui ne sont pas des obstacles mais qui prend en compte les hitbox des mobs
