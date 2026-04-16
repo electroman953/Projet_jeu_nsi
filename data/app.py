@@ -136,7 +136,7 @@ class App:
         self.world = World(self.width, self.height,0)
         self.recentrer = False
         self.obstacle = []
-        self.debug_hitbox = True
+        self.debug_hitbox = False
 
     def create_mobs(self):
         temp = []

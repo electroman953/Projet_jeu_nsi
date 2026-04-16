@@ -17,7 +17,7 @@ class Mob:
         self.knockback_vy = 0
         self.direction='down'
         self.texture=texture
-        self.passive = False
+        self.passive = True
         self.xp_drop_range = xp_drop_range
         self.loot_table = loot_table if loot_table is not None else []
         self.timer = 0
@@ -27,15 +27,16 @@ class Mob:
         self.screen_y = app.screen_center_y + (self.y - app.y_center) - self.height // 2
         if not self.type == "salamandre":
             dir_index = {'down': 0, 'left': 1, 'right': 2, 'up': 3}[self.direction]
-            frame = pyxel.frame_count // 10 % 3 if not app.timestop and self.passive else 0
+            frame = pyxel.frame_count // 10 % 3 if not app.timestop and not self.passive else 0
             u = self.texture[0] + 32 * frame
             v = self.texture[1] + 32 * dir_index
-        else:
-            s={'down':[(192,0),(192,127),(224,126)],'left':[(192,30),(192,127),(224,126)],'right':[(192,64),(192,159),(224,158)], 'up':[(192,96),(192,224),(224,223)]}[self.direction]
-            frame = pyxel.frame_count % 3 if not app.timestop and self.passive else 0
+        elif self.type == "salamandre":
+            s={'down':[(192,0),(192,127),(224,126)],'left':[(192,30),(192,159),(224,158)],'right':[(192,64),(192,189),(224,191)], 'up':[(192,96),(192,224),(224,223)]}[self.direction]
+            frame = pyxel.frame_count // 10 % 3 if not app.timestop and not self.passive else 0
             u,v=s[frame][0],s[frame][1]
 
         pyxel.blt(self.screen_x, self.screen_y, 2, u, v, self.width, self.height, colkey=8)
+
     def move(self, app, player_x, player_y):
         if self.health <= 0:
             return
@@ -65,6 +66,8 @@ class Mob:
             return
 
         if abs(self.x - player_x) + abs(self.y - player_y) > self.detection_range:
+            self.passive = True
+            self.direction = "down"
             return
         self.timer += 1
         if self.timer % 30 == 0:
