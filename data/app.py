@@ -48,10 +48,10 @@ class App:
         self.screen_center_y = self.height // 2
         self.correspondance_nom = {"damage" : "DMG", "crit_chance_bonus" : "CRIT CHANCE", "crit_multiplier_bonus" : "CRIT MULTIPLIER", "attack_speed_bonus" : "ATK SPEED", "defense" : "DEF", "bonus_health" : "HP"}
         self.zones = [
-            Zone("Easy", ["tortue", "renard"], 1, 60, 0, 0, 1024, 1024),
-            Zone("Medium", ["renard", "chien"], 2, 15, 1024, 0, 1024, 1024),
-            Zone("Hard", [ "chien", "lion"], 3, 15, 0, 1024, 1024, 1024),
-            Zone("Boss", ["salamandre"], 4, 10, 1024, 1024,1024, 1024)
+            Zone("Easy", ["tortue", "renard"], 1, 100, 0, 0, 1024, 1024),
+            Zone("Medium", ["renard", "chien"], 2, 0, 1024, 0, 1024, 1024),
+            Zone("Hard", [ "chien", "lion"], 3, 0, 0, 1024, 1024, 1024),
+            Zone("Boss", ["salamandre"], 4, 0, 1024, 1024,1024, 1024)
         ]
         self.palette_normal = [
             0x0D0D0D, 0x1D2B53, 0x7E2553, 0x1e5925,
@@ -127,7 +127,8 @@ class App:
 
         self.projectiles = []
         self.mobs = []
-        self.coffres = [Coffre(1, "Coffre de base", 840, 840,32,32, "une potion de soin"), Coffre(2, "Coffre de luxe", 845, 845,32,32, "une épée de foudre")]
+        self.coffres=[]
+        self.coffres = [Coffre(1, "Coffre de base", 8*40, 8*40,32,32, "une potion de soin"), Coffre(2, "Coffre de luxe", 8*45, 8*45,32,32, "une épée de foudre")]
         self.inventory = Inventory(self)
         self.player = Player()
         self.player_x_abs, self.player_y_abs = self.spawn_x, self.spawn_y
