@@ -110,12 +110,29 @@ class Player:
     def take_damage(self, app, n):
         if app.i_frames==0:
             print('AIE')
+            defense = self.get_current_defense(app)
+            actual_damage = max(1, n - defense)  # minimum 1 damage
             self.s_dmg=0.1
-            self.health=max(0,self.health-n)
+            self.health=max(0,self.health-actual_damage)
             app.i_frames = app.invincible_timer
         
     def regen(self, app, n):
-        self.health=min(self.base_health, self.health+n)
+        self.health=min(self.get_max_health(app), self.health+n)
+
+    def get_max_health(self, app):
+        bonus_health = 0
+        if app.inventory.items["armure"] is not None:
+            bonus_health = app.inventory.items["armure"].liste_attributs.get("bonus_health", 0)
+        return self.base_health + bonus_health
+
+    def update_health_to_max(self, app):
+        self.health = min(self.health, self.get_max_health(app))
+
+    def get_current_defense(self, app):
+        defense = self.base_defense
+        if app.inventory.items["armure"] is not None:
+            defense += app.inventory.items["armure"].liste_attributs.get("defense", 0)
+        return defense
 
     def is_dead(self):
         return self.health==0

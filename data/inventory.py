@@ -1,5 +1,5 @@
 import pyxel
-from data.items import sword, bow, staff, Armor
+from data.items import sword, bow, staff, Armor, Weapon
 
 class Inventory:
     def __init__(self, app):
@@ -75,15 +75,28 @@ class Inventory:
         case = self.récuperer_case_souris()
         if self.dragging_item is not None:
             if case is not None :
+                # Check if item type matches slot
+                if case == "arme" and not isinstance(self.dragging_item, Weapon):
+                    return  # Can't equip non-weapon in weapon slot
+                if case == "armure" and not isinstance(self.dragging_item, Armor):
+                    return  # Can't equip non-armor in armor slot
                 if self.items[case] is None:
                     self.items[case] = self.dragging_item
                     self.dragging_item = None
                     self.old_drag_case = None
+                    if case == "armure":
+                        bonus = self.items[case].liste_attributs.get("bonus_health", 0)
+                        app.player.health = min(app.player.get_max_health(app), app.player.health + bonus)
                 else:
+                    old_item = self.items[case]
                     temp = self.dragging_item
                     self.items[case], self.dragging_item = temp, self.items[case]
                     self.items[self.old_drag_case] = None
                     self.old_drag_case = None
+                    if case == "armure":
+                        old_bonus = old_item.liste_attributs.get("bonus_health", 0) if old_item else 0
+                        new_bonus = self.items[case].liste_attributs.get("bonus_health", 0)
+                        app.player.health = min(app.player.get_max_health(app), app.player.health - old_bonus + new_bonus)
 
             else:
                 self.items[self.old_drag_case] = self.dragging_item
