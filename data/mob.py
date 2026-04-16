@@ -57,10 +57,10 @@ class Mob:
             
             if move_x != 0 and not self.next_dest_is_obstacle(app, move_x, 0):
                 self.x += move_x
-                self.direction='right' if move_x>0 else 'left'
+
             if move_y != 0 and not self.next_dest_is_obstacle(app, 0, move_y):
                 self.y += move_y
-                self.direction='down' if move_y>0 else 'up'
+                
                 
             self.x = max(self.width // 2, min(self.x, app.world.word_width - self.width // 2))
             self.y = max(self.height // 2, min(self.y, app.world.word_height - self.height // 2))
@@ -89,7 +89,9 @@ class Mob:
                 dx = self.vitesse if dx > 0 else -self.vitesse
             if abs(dy) > self.vitesse:
                 dy = self.vitesse if dy > 0 else -self.vitesse
-
+            self.direction = "left" if dx>0 else "right"
+            self.direction = "down" if dy > 0 else "up"
+            
             if dx != 0 or dy != 0:
                 hit_player = self.next_dest_is_player(app, dx, dy)
                 if hit_player:
