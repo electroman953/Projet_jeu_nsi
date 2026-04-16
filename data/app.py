@@ -5,6 +5,7 @@ from data.player import Player
 from data.inventory import Inventory
 from data.mob import Mob
 from data.arrow import Arrow
+from data.coffre import Coffre
 
 class App:
     
@@ -126,6 +127,8 @@ class App:
             ('chien', random.randint(32, 1000), random.randint(32, 1000))
             for _ in range(5)
         ]
+        self.coffres = [
+            Coffre(1, "Coffre de bois", 10, 10, [])]
         self.create_mobs()
         self.inventory = Inventory(self)
         self.player = Player()
@@ -238,6 +241,7 @@ class App:
                 return
             
             self.world.place_map(self.x_center, self.y_center, self)
+            self.draw_coffres()
             self.player.draw(self)
             self.place_mobs()
             self.place_projectiles()
@@ -369,3 +373,7 @@ class App:
             pyxel.text(10,20,f"Timestop is ready", 7)
         pyxel.text(10,30,f"XP: {self.player.experience}", 7)
         pyxel.text(10,40,f"Level: {self.player.level}", 7)
+    
+    def draw_coffres(self):
+        for i in self.coffres:
+            i.draw(self)
