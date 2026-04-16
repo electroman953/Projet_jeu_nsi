@@ -37,34 +37,38 @@ class Player:
             self.run = True
             for i in range(temp_speed):
                 # On teste uniquement l'axe Y pour permettre de glisser sur les murs verticaux
-                if not self.next_dest_is_obstacle(app, 0, player_y_abs - 1):
+                if not self.next_dest_is_blocked(app, 0, player_y_abs - 1):
                     player_y_abs -= 1
                 else:
+                    self.open_colliding_chest(app, 0, player_y_abs - 1)
                     break
         if (pyxel.btn(pyxel.KEY_DOWN) or pyxel.btn(pyxel.KEY_S)) and yp_r <= app.height - self.height:
             self.direction = "down"
             self.run = True
             for i in range(temp_speed):
-                if not self.next_dest_is_obstacle(app, 0, player_y_abs + 1):
+                if not self.next_dest_is_blocked(app, 0, player_y_abs + 1):
                     player_y_abs += 1
                 else:
+                    self.open_colliding_chest(app, 0, player_y_abs + 1)
                     break
         if (pyxel.btn(pyxel.KEY_LEFT) or pyxel.btn(pyxel.KEY_Q)) and xp_r >= 0:
             self.direction = "left"
             self.run = True
             for i in range(temp_speed):
                 # On teste uniquement l'axe X pour glisser sur les murs horizontaux
-                if not self.next_dest_is_obstacle(app, player_x_abs - 1, 0):
+                if not self.next_dest_is_blocked(app, player_x_abs - 1, 0):
                     player_x_abs -= 1
                 else:
+                    self.open_colliding_chest(app, player_x_abs - 1, 0)
                     break
         if (pyxel.btn(pyxel.KEY_RIGHT) or pyxel.btn(pyxel.KEY_D)) and xp_r <= app.width - self.width:
             self.direction = "right"
             self.run = True
             for i in range(temp_speed):
-                if not self.next_dest_is_obstacle(app, player_x_abs + 1, 0):
+                if not self.next_dest_is_blocked(app, player_x_abs + 1, 0):
                     player_x_abs += 1
                 else:
+                    self.open_colliding_chest(app, player_x_abs + 1, 0)
                     break
         if player_x_abs == temp_speed:
             player_x_abs = self.speed
@@ -144,13 +148,25 @@ class Player:
             if self.collision_rect(next_x, next_y, self.width, self.height//2, obs[0]*8, obs[1]*8, 8, 8):
                 return True
         return False
+
+    def next_dest_is_blocked(self, app, dx, dy):
+        return self.next_dest_is_obstacle(app, dx, dy) or self.next_dest_is_chest(app, dx, dy)
+
+    def open_colliding_chest(self, app, dx, dy):
+        next_x = app.player_x_abs - self.width//2 + dx
+        next_y = app.player_y_abs + dy
+        for c in app.coffres:
+            if not c.ouvert and self.collision_rect(next_x, next_y, self.width, self.height//2, c.x, c.y, c.width, c.height):
+                print(c.ouvrir())
+                return
         
     def next_dest_is_chest(self, app, dx, dy):
-            next_x = app.player_x_abs - self.width//2 + dx
-            next_y = app.player_y_abs  + dy
-            for c in app.coffres:
-                    return True
-            return False
+        next_x = app.player_x_abs - self.width//2 + dx
+        next_y = app.player_y_abs  + dy
+        for c in app.coffres:
+            if self.collision_rect(next_x, next_y, self.width, self.height//2, c.x, c.y, c.width, c.height):
+                return True
+        return False
 
     def level_up(self, app):
         if self.experience >= self.experience_to_next_level:

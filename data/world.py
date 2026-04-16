@@ -23,33 +23,37 @@ class World:
             app.player.direction = "right"
             app.player.run = True
             for _ in range(speed):
-                if not app.player.next_dest_is_obstacle(app, dx + 1, dy):
+                if not app.player.next_dest_is_blocked(app, dx + 1, dy):
                     dx += 1
                 else:
+                    app.player.open_colliding_chest(app, dx + 1, dy)
                     break
         if pyxel.btn(pyxel.KEY_LEFT) or pyxel.btn(pyxel.KEY_Q):
             app.player.direction = "left"
             app.player.run = True
             for _ in range(speed):
-                if not app.player.next_dest_is_obstacle(app, dx - 1, dy):
+                if not app.player.next_dest_is_blocked(app, dx - 1, dy):
                     dx -= 1
                 else:
+                    app.player.open_colliding_chest(app, dx - 1, dy)
                     break
         if pyxel.btn(pyxel.KEY_UP) or pyxel.btn(pyxel.KEY_Z):
             app.player.direction = "up"
             app.player.run = True
             for _ in range(speed):
-                if not app.player.next_dest_is_obstacle(app, dx, dy - 1):
+                if not app.player.next_dest_is_blocked(app, dx, dy - 1):
                     dy -= 1
                 else:
+                    app.player.open_colliding_chest(app, dx, dy - 1)
                     break
         if pyxel.btn(pyxel.KEY_DOWN) or pyxel.btn(pyxel.KEY_S):
             app.player.direction = "down"
             app.player.run = True
             for _ in range(speed):
-                if not app.player.next_dest_is_obstacle(app, dx, dy + 1):
+                if not app.player.next_dest_is_blocked(app, dx, dy + 1):
                     dy += 1
                 else:
+                    app.player.open_colliding_chest(app, dx, dy + 1)
                     break
         if dx == speed:
             dx = real_speed
