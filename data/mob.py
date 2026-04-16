@@ -10,39 +10,32 @@ class Mob:
         self.width = w
         self.height = h
         self.color = c
-        self.vitesse = 1.5
+        self.vitesse = 1
         self.chemin  = []
         self.timer = pyxel.rndi(0, 29)
         self.knockback_vx = 0
         self.knockback_vy = 0
         self.direction='down'
         self.texture=texture
-
+        self.passive = False
         self.xp_drop_range = xp_drop_range
         self.loot_table = loot_table if loot_table is not None else []
         self.timer = 0
-        self.detection_range = 400
+        self.detection_range = 200
     def draw(self, app):
         self.screen_x = app.screen_center_x + (self.x - app.x_center) - self.width // 2
         self.screen_y = app.screen_center_y + (self.y - app.y_center) - self.height // 2
-        if not self.type=='salamandre':
-            if self.direction=='down':
-                pyxel.blt(self.screen_x, self.screen_y, 2,self.texture[0]*pyxel.frame_count%20%3, self.texture[1]*pyxel.frame_count%20%3, self.width, self.height, colkey=8)
-            elif self.direction=='left':
-                pyxel.blt(self.screen_x, self.screen_y, 2, self.texture[0]*pyxel.frame_count%20%3, (self.texture[1]+32)*pyxel.frame_count%20%3, self.width, self.height, colkey=8)
-            elif self.direction=='right':
-                pyxel.blt(self.screen_x, self.screen_y, 2, self.texture[0]*pyxel.frame_count%20%3, (self.texture[1]+64)*pyxel.frame_count%20%3, self.width, self.height, colkey=8)
-            else: #up
-                pyxel.blt(self.screen_x, self.screen_y, 2, self.texture[0]*pyxel.frame_count%20%3, (self.texture[1]+96)*pyxel.frame_count%20%3, self.width, self.height, colkey=8)        
+        if not self.type == "salamandre":
+            dir_index = {'down': 0, 'left': 1, 'right': 2, 'up': 3}[self.direction]
+            frame = pyxel.frame_count // 10 % 3 if not app.timestop and self.passive else 0
+            u = self.texture[0] + 32 * frame
+            v = self.texture[1] + 32 * dir_index
         else:
-            if self.direction=='down':
-                pyxel.blt(self.screen_x, self.screen_y, 2, 192, 0, self.width, self.height, colkey=8)
-            elif self.direction=='left':
-                pyxel.blt(self.screen_x, self.screen_y, 2, 192, 32, self.width, self.height, colkey=8)
-            elif self.direction=='right':
-                pyxel.blt(self.screen_x, self.screen_y, 2, 192, 64, self.width, self.height, colkey=8)
-            else: #up
-                pyxel.blt(self.screen_x, self.screen_y, 2, 192, 96, self.width, self.height, colkey=8)
+            s={'down':[(192,0),(192,127),(224,126)],'left':[(192,30),(192,127),(224,126)],'right':[(192,64),(192,159),(224,158)], 'up':[(192,96),(192,224),(224,223)]}[self.direction]
+            frame = pyxel.frame_count % 3 if not app.timestop and self.passive else 0
+            u,v=s[frame][0],s[frame][1]
+
+        pyxel.blt(self.screen_x, self.screen_y, 2, u, v, self.width, self.height, colkey=8)
     def move(self, app, player_x, player_y):
         if self.health <= 0:
             return
@@ -78,8 +71,9 @@ class Mob:
             self.timer = 0
             debut = (self.x//8, self.y//8)
             fin = (player_x//8, player_y//8)
-            self.chemin = app.world.parcours_largeur(debut, fin, app)
+            self.chemin = app.world.parcours_largeur(debut, fin, app, self)
         if self.chemin:
+            self.passive = False
             next_cell = self.chemin[0]
             next_x = next_cell[0] * 8 + 4
             next_y = next_cell[1] * 8 + 4
@@ -89,9 +83,11 @@ class Mob:
                 dx = self.vitesse if dx > 0 else -self.vitesse
             if abs(dy) > self.vitesse:
                 dy = self.vitesse if dy > 0 else -self.vitesse
-            self.direction = "left" if dx>0 else "right"
-            self.direction = "down" if dy > 0 else "up"
-            
+            if abs(dx) >= abs(dy):
+                self.direction = "right" if dx > 0 else "left"
+            else:
+                self.direction = "down" if dy > 0 else "up"
+                        
             if dx != 0 or dy != 0:
                 hit_player = self.next_dest_is_player(app, dx, dy)
                 if hit_player:
@@ -111,10 +107,13 @@ class Mob:
                         elif not self.next_dest_is_obstacle(app, 0, dy):
                             self.y += dy
                     if hit_player:
-                        app.player.take_damage(self.damage)
+                        app.player.take_damage(app, self.damage)
 
             if abs(self.x - next_x) <= self.vitesse and abs(self.y - next_y) <= self.vitesse:
                 self.chemin.pop(0)
+        else:
+            self.passive = True
+            self.direction = "down"
     def collision_rect(self, x1, y1, w1, h1, x2, y2, w2, h2):
         return (x1 < x2 + w2 and
                 x1 + w1 > x2 and

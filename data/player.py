@@ -32,35 +32,37 @@ class Player:
         yp_r = app.screen_center_y + (app.player_y_abs - app.y_center) - self.height//2
         self.run = False
         player_y_abs = player_x_abs = 0
-        if pyxel.btn(pyxel.KEY_UP) or pyxel.btn(pyxel.KEY_Z) and yp_r >= 0:
+        if (pyxel.btn(pyxel.KEY_UP) or pyxel.btn(pyxel.KEY_Z)) and yp_r >= 0:
             self.direction = "up"
             self.run = True
             for i in range(temp_speed):
-                if not self.next_dest_is_obstacle(app, 0, -1):
+                # On teste uniquement l'axe Y pour permettre de glisser sur les murs verticaux
+                if not self.next_dest_is_obstacle(app, 0, player_y_abs - 1):
                     player_y_abs -= 1
                 else:
                     break
-        if pyxel.btn(pyxel.KEY_DOWN) or pyxel.btn(pyxel.KEY_S) and yp_r<=app.height-self.height:
+        if (pyxel.btn(pyxel.KEY_DOWN) or pyxel.btn(pyxel.KEY_S)) and yp_r <= app.height - self.height:
             self.direction = "down"
             self.run = True
             for i in range(temp_speed):
-                if not self.next_dest_is_obstacle(app, 0, 1):
+                if not self.next_dest_is_obstacle(app, 0, player_y_abs + 1):
                     player_y_abs += 1
                 else:
                     break
-        if pyxel.btn(pyxel.KEY_LEFT) or pyxel.btn(pyxel.KEY_Q) and xp_r>=0:
+        if (pyxel.btn(pyxel.KEY_LEFT) or pyxel.btn(pyxel.KEY_Q)) and xp_r >= 0:
             self.direction = "left"
             self.run = True
             for i in range(temp_speed):
-                if not self.next_dest_is_obstacle(app, -1, 0):
+                # On teste uniquement l'axe X pour glisser sur les murs horizontaux
+                if not self.next_dest_is_obstacle(app, player_x_abs - 1, 0):
                     player_x_abs -= 1
                 else:
                     break
-        if pyxel.btn(pyxel.KEY_RIGHT) or pyxel.btn(pyxel.KEY_D) and xp_r<=app.width-self.width:
+        if (pyxel.btn(pyxel.KEY_RIGHT) or pyxel.btn(pyxel.KEY_D)) and xp_r <= app.width - self.width:
             self.direction = "right"
             self.run = True
             for i in range(temp_speed):
-                if not self.next_dest_is_obstacle(app, 1, 0):
+                if not self.next_dest_is_obstacle(app, player_x_abs + 1, 0):
                     player_x_abs += 1
                 else:
                     break

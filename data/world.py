@@ -92,28 +92,41 @@ class World:
 
         if app.x_center == target_x and app.y_center == target_y:
             app.recentrer = False
-    def parcours_largeur(self, debut, fin, app):
+    def parcours_largeur(self, debut, fin, app, mob=None):
         obstacles = [(i, j) for i, j in app.obstacle]
-        # Ajouter une zone de sécurité autour des obstacles pour que les ennemis avec une hitbox plus large puissent passer sans bloquer
+        # Ajouter une zone de sécurité dynamique si un mob est fourni, sinon on utilise les obstacles normaux
         expanded_obstacles = set(obstacles)
-        for obs in obstacles:
-            for dx, dy in [(1,0), (-1,0), (0,1), (0,-1), (1,1), (-1,-1), (1,-1), (-1,1)]:
-                expanded_obstacles.add((obs[0]+dx, obs[1]+dy))
+        if mob:
+            largeur_cases = (mob.width // 8) // 2
+            hauteur_cases = (mob.height // 8) // 2
+            if largeur_cases > 0 or hauteur_cases > 0:
+                for obs in obstacles:
+                    for dx in range(-largeur_cases, largeur_cases + 1):
+                        for dy in range(-hauteur_cases, hauteur_cases + 1):
+                            expanded_obstacles.add((obs[0]+dx, obs[1]+dy))
+        else:
+            expanded_obstacles = set(obstacles)
 
         queue = [debut]
         viens_de = {debut: None}
         while queue:
             actuel = queue.pop(0)
+            
+            # Limiter le nombre de cases explorées pour éviter les crashs / boucles infinies
+            if len(viens_de) > 40000:
+                return []
+                
             if actuel == fin:
                 chemin = []
                 while actuel is not None:
                     chemin.append(actuel)
                     actuel = viens_de[actuel]
-                    chemin=chemin[::-1]
+                chemin = chemin[::-1]
                 return chemin[1:]
             for dx, dy in [(0,1),(0,-1),(1,0),(-1,0),(1,1),(1,-1),(-1,1),(-1,-1)]:
                 voisin = (actuel[0] + dx, actuel[1] + dy)
-                if not (0 <= voisin[0] < self.word_width and 0 <= voisin[1] < self.word_height):
+                # Corriger les limites de la carte pour qu'elles soient en cases (divisées par 8)
+                if not (0 <= voisin[0] < self.word_width // 8 and 0 <= voisin[1] < self.word_height // 8):
                     continue
                 if dx != 0 and dy != 0:
                     if (actuel[0] + dx, actuel[1]) in expanded_obstacles or (actuel[0], actuel[1] + dy) in expanded_obstacles:
