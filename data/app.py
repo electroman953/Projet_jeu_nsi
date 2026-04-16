@@ -6,6 +6,7 @@ from data.inventory import Inventory
 from data.mob import Mob
 from data.arrow import Arrow
 from data.coffre import Coffre
+from data.zone import Zone
 
 class App:
     
@@ -38,6 +39,12 @@ class App:
         self.screen_center_x = self.width // 2
         self.screen_center_y = self.height // 2
         self.correspondance_nom = {"damage" : "DMG", "crit_chance_bonus" : "CRIT CHANCE", "crit_multiplier_bonus" : "CRIT MULTIPLIER", "attack_speed_bonus" : "ATK SPEED", "defense" : "DEF", "bonus_health" : "HP"}
+        self.zones = [
+            Zone("Easy", ["tortue", "renard"], 1, 15, 0, 0, 1024, 1024),
+            Zone("Medium", ["renard", "chien"], 2, 15, 0, 1024, 1024, 1024),
+            Zone("Hard", ["renard", "chien", "lion"], 3, 15, 0, 1024, 1024, 1024),
+            Zone("Boss", ["salamandre"], 4, 10, 512, 1024,1024, 1024)
+        ]
         self.palette_normal = [
             0x0D0D0D, 0x1D2B53, 0x7E2553, 0x1e5925,
             0xAB5236, 0x1E8C0A, 0xC2C3C7, 0xFFF1E8,  
@@ -111,25 +118,8 @@ class App:
         self.x_center, self.y_center = self.spawn_x, self.spawn_y
 
         self.projectiles = []
-        self.mobs = [
-            ('tortue', random.randint(32, 1000), random.randint(32, 1000))
-            for _ in range(12)
-            ]+[
-            ('lion', random.randint(32, 1000), random.randint(32, 1000))
-            for _ in range(3)
-            ]+[
-            ('renard', random.randint(32, 1000), random.randint(32, 1000))
-            for _ in range(10)
-            ]+[
-            ('salamandre', random.randint(32, 1000), random.randint(32, 1000))
-            for _ in range(1)
-            ]+[
-            ('chien', random.randint(32, 1000), random.randint(32, 1000))
-            for _ in range(5)
-        ]
-        self.coffres = [
-            Coffre(1, "Coffre de bois", 10, 10, [])]
-        self.create_mobs()
+        self.mobs = []
+        self.coffres = []
         self.inventory = Inventory(self)
         self.player = Player()
         self.player_x_abs, self.player_y_abs = self.spawn_x, self.spawn_y
@@ -137,8 +127,9 @@ class App:
         self.recentrer = False
         self.obstacle = []
         self.debug_hitbox = False
+        
 
-    def create_mobs(self):
+    def create_mobs(self, monstre, zone=None):
         temp = []
         type={
             "tortue": {"health": 50, "damage": 20, "height": 32, "width": 32, "color": 8, "xp_drop_range": (5, 15), "loot_table": [], 'texture':(0,0)},
@@ -147,11 +138,32 @@ class App:
             "salamandre":{"health": 550, "damage": 150, "height": 32, "width": 32, "color": 10, "xp_drop_range": (100,150), "loot_table": [],'texture':(192,0)},
             "chien":{"health": 80, "damage": 40, "height": 32, "width": 32, "color": 11, "xp_drop_range": (25,35), "loot_table": [],'texture':(96,128)}
             }
-        for mob_type, x, y in self.mobs:
-            mob = Mob(type[mob_type]["health"], type[mob_type]["damage"], mob_type, x, y, type[mob_type]["width"], type[mob_type]["height"], type[mob_type]["color"], type[mob_type]["xp_drop_range"], type[mob_type]["loot_table"], type[mob_type]["texture"])
-            temp.append(mob)
-        self.mobs = temp
-
+        if zone is not None:
+            #trouve des coordonée x et y aléatoires dans la zone qui ne sont pas des obstacles mais qui prend en compte les hitbox des mobs
+            
+            while True:
+                x = random.randint(zone.x, zone.x + zone.width)
+                y = random.randint(zone.y, zone.y + zone.height)
+                collision = False
+                for i in range(-type[monstre]["width"]//2, type[monstre]["width"]//2 + 1, 4):
+                    for j in range(-type[monstre]["height"]//2, type[monstre]["height"]//2 + 1, 4):
+                        # On lit directement la carte complète en divisant par 8 pour avoir la tuile
+                        if pyxel.tilemaps[self.world.tm].pget((x + i) // 8, (y + j) // 8) in self.elt_col:
+                            collision = True
+                            break
+                    if collision:
+                        break
+                if not collision:
+                    break
+        else:
+            x, y = pyxel.rndi(0, self.width), pyxel.rndi(0, self.height)
+        self.mobs.append(Mob(type[monstre]["health"], type[monstre]["damage"], monstre, x, y, type[monstre]["width"], type[monstre]["height"], type[monstre]["color"], type[monstre]["xp_drop_range"], type[monstre]["loot_table"], type[monstre]["texture"], zone.name))
+    def check_mobs(self):
+        for zone in self.zones:
+            while len([mob for mob in self.mobs if mob.spawn_zone == zone.name]) < zone.max_mob:
+                monstre = random.choice(zone.monstre)
+                self.create_mobs(monstre, zone)
+                zone.timer_respawn = zone.respawn_time
     def add_player_projectile(self, type, subtype):
         a={"arrow":{"basic":(8,5)}}
         self.orient_player_to_mouse()
@@ -180,6 +192,10 @@ class App:
                 self.debug_hitbox = not self.debug_hitbox
             self.player.check_key(self)
             if pyxel.frame_count % 6 == 0:
+                self.check_mobs()
+                for zone in self.zones:
+                    if zone.timer_respawn > 0:
+                        zone.timer_respawn = max(0, round(zone.timer_respawn - 0.1, 1))
                 for i in self.mobs:
                     i.is_dead(self)
                 if self.timestop_timer > 0:
@@ -373,6 +389,7 @@ class App:
             pyxel.text(10,20,f"Timestop is ready", 7)
         pyxel.text(10,30,f"XP: {self.player.experience}", 7)
         pyxel.text(10,40,f"Level: {self.player.level}", 7)
+        pyxel.text(10, 50, f"x : {self.player_x_abs} y: {self.player_y_abs}", 7)
     
     def draw_coffres(self):
         for i in self.coffres:

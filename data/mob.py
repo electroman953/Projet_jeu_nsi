@@ -1,13 +1,14 @@
 import pyxel
 
 class Mob:
-    def __init__(self, health, damage, type, x, y, w, h, c, xp_drop_range, loot_table=None, texture=(0,0)):
+    def __init__(self, health, damage, type, x, y, w, h, c, xp_drop_range, loot_table=None, texture=(0,0), spawn_zone=None):
         self.health = health
         self.damage = damage
         self.type = type
         self.x = x
         self.y = y
         self.width = w
+        self.spawn_zone = spawn_zone
         self.height = h
         self.color = c
         self.vitesse = 1
