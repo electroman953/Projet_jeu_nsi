@@ -10,12 +10,13 @@ class Mob:
         self.width = w
         self.height = h
         self.color = c
-        self.vitesse = 1
+        self.vitesse = 1.5
         self.chemin  = []
         self.timer = pyxel.rndi(0, 29)
         self.knockback_vx = 0
         self.knockback_vy = 0
-        
+        self.direction='down'
+
         self.xp_drop_range = xp_drop_range
         self.loot_table = loot_table if loot_table is not None else []
         self.timer = 0
@@ -25,6 +26,7 @@ class Mob:
         self.screen_y = app.screen_center_y + (self.y - app.y_center) - self.height // 2
         pyxel.rect(self.screen_x, self.screen_y, self.width, self.height, self.color)
         #pyxel.blt(self.x, self.y, 0, 0, 0, 16, 16)
+        a={}
     def move(self, app, player_x, player_y):
         if self.health <= 0:
             return
@@ -39,8 +41,10 @@ class Mob:
             
             if move_x != 0 and not self.next_dest_is_obstacle(app, move_x, 0):
                 self.x += move_x
+                self.direction='right' if move_x>0 else 'left'
             if move_y != 0 and not self.next_dest_is_obstacle(app, 0, move_y):
                 self.y += move_y
+                self.direction='down' if move_y>0 else 'up'
                 
             self.x = max(self.width // 2, min(self.x, app.world.word_width - self.width // 2))
             self.y = max(self.height // 2, min(self.y, app.world.word_height - self.height // 2))

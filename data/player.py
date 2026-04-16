@@ -3,7 +3,7 @@ import pyxel
 class Player:
 
     def __init__(self):
-        self.speed = 2 * pyxel.sqrt(2)
+        self.speed = 2*pyxel.sqrt(2)
         self.width = 19
         self.height = 34
         self.direction = "down"
@@ -132,7 +132,7 @@ class Player:
             self.experience -= self.experience_to_next_level
             self.experience_to_next_level = int(self.experience_to_next_level * 1.3)
             self.base_health += 20
-            self.health = min (self.health + 30, self.base_health)
+            self.health = self.base_health
             self.base_damage += 5
             self.base_defense += 2
             self.base_critical_chance += 0.05

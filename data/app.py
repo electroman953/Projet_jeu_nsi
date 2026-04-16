@@ -109,8 +109,20 @@ class App:
 
         self.projectiles = []
         self.mobs = [
-            ('slime', random.randint(32, 1000), random.randint(32, 1000))
+            ('tortue', random.randint(32, 1000), random.randint(32, 1000))
             for _ in range(12)
+            ]+[
+            ('lion', random.randint(32, 1000), random.randint(32, 1000))
+            for _ in range(3)
+            ]+[
+            ('renard', random.randint(32, 1000), random.randint(32, 1000))
+            for _ in range(10)
+            ]+[
+            ('salamandre', random.randint(32, 1000), random.randint(32, 1000))
+            for _ in range(1)
+            ]+[
+            ('chien', random.randint(32, 1000), random.randint(32, 1000))
+            for _ in range(5)
         ]
         self.create_mobs()
         self.inventory = Inventory(self)
@@ -123,7 +135,13 @@ class App:
 
     def create_mobs(self):
         temp = []
-        type={"slime": {"health": 100, "damage": 10, "height": 16, "width": 16, "color": 8, "xp_drop_range": (5, 15), "loot_table": []}}
+        type={
+            "tortue": {"health": 50, "damage": 20, "height": 32, "width": 32, "color": 8, "xp_drop_range": (5, 15), "loot_table": [], 'texture':(0,0)},
+            "lion":{"health": 200, "damage": 100, "height": 32, "width": 32, "color": 7, "xp_drop_range": (50,60), "loot_table": [],'texture':(0,125)},
+            "renard":{"health": 100, "damage": 50, "height": 32, "width": 32, "color": 9, "xp_drop_range": (10, 20), "loot_table": [],'texture':(96,0)},
+            "salamandre":{"health": 550, "damage": 150, "height": 32, "width": 32, "color": 10, "xp_drop_range": (100,150), "loot_table": [],'texture':(192,0)},
+            "chien":{"health": 80, "damage": 40, "height": 32, "width": 32, "color": 11, "xp_drop_range": (25,35), "loot_table": [],'texture':(96,128)}
+            }
         for mob_type, x, y in self.mobs:
             mob = Mob(type[mob_type]["health"], type[mob_type]["damage"], mob_type, x, y, type[mob_type]["width"], type[mob_type]["height"], type[mob_type]["color"], type[mob_type]["xp_drop_range"], type[mob_type]["loot_table"])
             temp.append(mob)
@@ -264,21 +282,22 @@ class App:
             self.player.direction = "down" if dy >= 0 else "up"
 
     def get_melee_hitboxes(self):
-        slash_range = self.SLASH_RANGE
+        slash_range = self.SLASH_RANGE//1.5
         player_box = (
-            self.player_x_abs - self.player.width // 2,
-            self.player_y_abs - self.player.height // 2,
+            self.player_x_abs - (self.player.width // 2),
+            self.player_y_abs - (self.player.height // 2),
             self.player.width,
             self.player.height,
         )
+        # Même rectangle carré pour toutes directions, centré devant le joueur
         if self.player.direction == 'up':
-            slash_box = (player_box[0], player_box[1] - slash_range, player_box[2], slash_range)
+            slash_box = (player_box[0] + (player_box[2] - slash_range) // 2, player_box[1] - slash_range, slash_range, slash_range)
         elif self.player.direction == 'down':
-            slash_box = (player_box[0], player_box[1] + player_box[3], player_box[2], slash_range)
+            slash_box = (player_box[0] + (player_box[2] - slash_range) // 2, player_box[1] + player_box[3], slash_range, slash_range)
         elif self.player.direction == 'left':
-            slash_box = (player_box[0] - slash_range, player_box[1], slash_range, player_box[3])
+            slash_box = (player_box[0] - slash_range, player_box[1] + (player_box[3] - slash_range) // 2, slash_range, slash_range)
         else:  # right
-            slash_box = (player_box[0] + player_box[2], player_box[1], slash_range, player_box[3])
+            slash_box = (player_box[0] + player_box[2], player_box[1] + (player_box[3] - slash_range) // 2, slash_range, slash_range)
         return player_box, slash_box
 
     def player_slash(self):
