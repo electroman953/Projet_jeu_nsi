@@ -104,6 +104,8 @@ class Player:
             app.inventory.open(app)
         if app.inventory.on_screen and pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
             app.inventory.drag_item(app)
+        if pyxel.btnp(pyxel.KEY_DELETE):
+            app.inventory.supprimer_item()
 
     def collision_rect(self, x1, y1, w1, h1, x2, y2, w2, h2):
         return (x1 < x2 + w2 and

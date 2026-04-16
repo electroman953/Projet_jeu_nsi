@@ -284,6 +284,7 @@ class App:
             else:
                 pyxel.colors[:] = self.palette_normal    
             if self.inventory.on_screen:
+                pyxel.images[0].load(0, 0, '../Textures/items.png')
                 self.inventory.afficher(self)
                 self.inventory.over_item(self)
             if self.debug_hitbox:

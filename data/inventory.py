@@ -134,6 +134,18 @@ class Inventory:
         for i in range(len(lines)):
             color = 7 if i == 0 else (6 if i == 1 else 10)
             pyxel.text(tx + 4, ty + 4 + i * 9, lines[i], color)
+    def add_item(self, item):
+        for idx in range(1, 21):
+            if self.items[idx] is None:
+                self.items[idx] = item
+                return True
+        return False
+    def supprimer_item(self):
+        case = self.récuperer_case_souris()
+        if case is not None and self.items[case] is not None:
+            self.items[case] = None
+            return True
+        return False
 def make_item(data):
     type_, name, desc, x, y, stat, *extra = data
     bonus = extra[0] if extra else {}
