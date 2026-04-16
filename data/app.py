@@ -143,7 +143,7 @@ class App:
             "chien":{"health": 80, "damage": 40, "height": 32, "width": 32, "color": 11, "xp_drop_range": (25,35), "loot_table": [],'texture':(96,128)}
             }
         for mob_type, x, y in self.mobs:
-            mob = Mob(type[mob_type]["health"], type[mob_type]["damage"], mob_type, x, y, type[mob_type]["width"], type[mob_type]["height"], type[mob_type]["color"], type[mob_type]["xp_drop_range"], type[mob_type]["loot_table"])
+            mob = Mob(type[mob_type]["health"], type[mob_type]["damage"], mob_type, x, y, type[mob_type]["width"], type[mob_type]["height"], type[mob_type]["color"], type[mob_type]["xp_drop_range"], type[mob_type]["loot_table"], texture)
             temp.append(mob)
         self.mobs = temp
 
