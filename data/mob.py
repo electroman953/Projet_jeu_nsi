@@ -96,19 +96,19 @@ class Mob:
                 hit_player = self.next_dest_is_player(app, dx, dy)
                 if hit_player:
                     app.player.take_damage(app, self.damage)
-                elif not self.next_dest_is_obstacle(app, dx, dy):
+                elif not self.next_dest_is_blocked(app, dx, dy):
                     self.x += dx
                     self.y += dy
                 else:
                     if dx != 0:
                         if self.next_dest_is_player(app, dx, 0):
                             hit_player = True
-                        elif not self.next_dest_is_obstacle(app, dx, 0):
+                        elif not self.next_dest_is_blocked(app, dx, 0):
                             self.x += dx
                     if dy != 0:
                         if self.next_dest_is_player(app, 0, dy):
                             hit_player = True
-                        elif not self.next_dest_is_obstacle(app, 0, dy):
+                        elif not self.next_dest_is_blocked(app, 0, dy):
                             self.y += dy
                     if hit_player:
                         app.player.take_damage(app, self.damage)
@@ -169,5 +169,17 @@ class Mob:
         next_y = self.y - self.height//2 + dy
         for obs in app.obstacle:
             if self.collision_rect(next_x, next_y, self.width, self.height, obs[0]*8, obs[1]*8, 8, 8):
+                return True
+        return False
+
+    def next_dest_is_blocked(self, app, dx, dy):
+        return self.next_dest_is_obstacle(app, dx, dy) or self.next_dest_is_chest(app, dx, dy)
+    
+        
+    def next_dest_is_chest(self, app, dx, dy):
+        next_x = self.x - self.width // 2 + dx
+        next_y = self.y - self.height // 2 + dy
+        for c in app.coffres:
+            if self.collision_rect(next_x, next_y, self.width, self.height, c.x, c.y, c.width, c.height):
                 return True
         return False
