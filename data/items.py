@@ -22,10 +22,12 @@ class Item:
             app.orient_player_to_mouse()
             self.attack(app)
 class Potion(Item):
-    def __init__(self, name, description, image_x, image_y, heal_amount):
+    def __init__(self, name, description, image_x, image_y, attributs, value, duration=0):
         super().__init__(name, description, image_x, image_y)
         self.type = "potion"
-        self.liste_attributs["heal_amount"] = heal_amount
+        self.liste_attributs = attributs
+        self.value = value
+        self.duration = duration
 class Weapon(Item):
     def __init__(self, name, description, image_x, image_y, damage, crit_chance_bonus=0, crit_multiplier_bonus=0, attack_speed_bonus=0):
         super().__init__(name, description, image_x, image_y)

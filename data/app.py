@@ -129,7 +129,7 @@ class App:
         self.projectiles = []
         self.mobs = []
         self.coffres=[]
-        self.coffres = [Coffre(1, "Coffre de base", 8*40, 8*40,32,32, "une potion de soin"), Coffre(2, "Coffre de luxe", 8*45, 8*45,32,32, "une épée de foudre")]
+        self.coffres = [Coffre(1, "Coffre de base", 8*40 + 128, 8*40,32,32, "une potion de soin"), Coffre(2, "Coffre de luxe", 8*45, 8*45,32,32, "une épée de foudre")]
         self.inventory = Inventory(self)
         self.player = Player()
         self.player_x_abs, self.player_y_abs = self.spawn_x, self.spawn_y
@@ -168,6 +168,12 @@ class App:
         else:
             x, y = pyxel.rndi(0, self.width), pyxel.rndi(0, self.height)
         self.mobs.append(Mob(type[monstre]["health"], type[monstre]["damage"], monstre, x, y, type[monstre]["width"], type[monstre]["height"], type[monstre]["color"], type[monstre]["xp_drop_range"], type[monstre]["loot_table"], type[monstre]["texture"], zone.name))
+    def check_potions(self):
+        if pyxel.frame_count % 60 == 0:
+            for potion in self.potion_active:
+                potion["duration"] -= 1
+                if potion["duration"] <= 0:
+                    self.potion_active.remove(potion)
     def check_mobs(self):
         for zone in self.zones:
             while len([mob for mob in self.mobs if mob.spawn_zone == zone.name]) < zone.max_mob:
