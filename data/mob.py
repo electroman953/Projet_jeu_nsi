@@ -1,7 +1,7 @@
 import pyxel
 
 class Mob:
-    def __init__(self, health, damage, type, x, y, w, h, c, xp_drop_range, loot_table=None):
+    def __init__(self, health, damage, type, x, y, w, h, c, xp_drop_range, loot_table=None, texture=(0,0)):
         self.health = health
         self.damage = damage
         self.type = type
@@ -16,6 +16,7 @@ class Mob:
         self.knockback_vx = 0
         self.knockback_vy = 0
         self.direction='down'
+        self.texture=texture
 
         self.xp_drop_range = xp_drop_range
         self.loot_table = loot_table if loot_table is not None else []
@@ -24,9 +25,24 @@ class Mob:
     def draw(self, app):
         self.screen_x = app.screen_center_x + (self.x - app.x_center) - self.width // 2
         self.screen_y = app.screen_center_y + (self.y - app.y_center) - self.height // 2
-        pyxel.rect(self.screen_x, self.screen_y, self.width, self.height, self.color)
-        #pyxel.blt(self.x, self.y, 0, 0, 0, 16, 16)
-        a={}
+        if not self.type=='salamandre':
+            if self.direction=='down':
+                pyxel.blt(self.screen_x, self.screen_y, 2,self.texture[0]*pyxel.frame_count%20%3, self.texture[1]*pyxel.frame_count%20%3, self.width, self.height, colkey=8)
+            elif self.direction=='left':
+                pyxel.blt(self.screen_x, self.screen_y, 2, self.texture[0]*pyxel.frame_count%20%3, (self.texture[1]+32)*pyxel.frame_count%20%3, self.width, self.height, colkey=8)
+            elif self.direction=='right':
+                pyxel.blt(self.screen_x, self.screen_y, 2, self.texture[0]*pyxel.frame_count%20%3, (self.texture[1]+64)*pyxel.frame_count%20%3, self.width, self.height, colkey=8)
+            else: #up
+                pyxel.blt(self.screen_x, self.screen_y, 2, self.texture[0]*pyxel.frame_count%20%3, (self.texture[1]+96)*pyxel.frame_count%20%3, self.width, self.height, colkey=8)        
+        else:
+            if self.direction=='down':
+                pyxel.blt(self.screen_x, self.screen_y, 2, 192, 0, self.width, self.height, colkey=8)
+            elif self.direction=='left':
+                pyxel.blt(self.screen_x, self.screen_y, 2, 192, 32, self.width, self.height, colkey=8)
+            elif self.direction=='right':
+                pyxel.blt(self.screen_x, self.screen_y, 2, 192, 64, self.width, self.height, colkey=8)
+            else: #up
+                pyxel.blt(self.screen_x, self.screen_y, 2, 192, 96, self.width, self.height, colkey=8)
     def move(self, app, player_x, player_y):
         if self.health <= 0:
             return
