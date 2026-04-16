@@ -144,7 +144,14 @@ class Player:
             if self.collision_rect(next_x, next_y, self.width, self.height//2, obs[0]*8, obs[1]*8, 8, 8):
                 return True
         return False
-    
+        
+    def next_dest_is_chest(self, app, dx, dy):
+            next_x = app.player_x_abs - self.width//2 + dx
+            next_y = app.player_y_abs  + dy
+            for c in app.coffres:
+                    return True
+            return False
+
     def level_up(self, app):
         if self.experience >= self.experience_to_next_level:
             self.level += 1
