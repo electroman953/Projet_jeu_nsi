@@ -1,10 +1,10 @@
-# Documentation du jeu
+# Documentation du Justin's Journey
 
 ## 1. Presentation generale
-Jeu d'action top-down realise avec Pyxel. Le joueur explore une carte tilemap, affronte des mobs, recupere des objets, gere un inventaire et peut activer un mode de timestop. La boucle principale passe par trois etats: menu, jeu, mort. La progression se fait via l'XP et les niveaux, avec des armes (corps-a-corps ou distance) et des armures qui modifient les stats.
+Jeu d'action top-down realise avec Pyxel. Le joueur, qui s'appelle justin, explore une carte tilemap, affronte des mobs, recupere des objets, gere un inventaire et peut activer un mode de timestop. La boucle principale passe par trois etats: menu, jeu, mort. La progression se fait via l'XP et les niveaux, avec des armes (corps-a-corps ou distance) et des armures qui modifient les stats.
 
 ### Lancement
-Prerequis: Python 3 et Pyxel installe. Le point d'entree est [main.py](main.py), qui instancie `App`. Les chargements de ressources dans [data/app.py](data/app.py) et [data/player.py](data/player.py) utilisent des chemins relatifs; si les textures ne se chargent pas, ajuster le dossier de lancement.
+Prerequis: Python 3 et Pyxel 2.9.0 installe. Le point d'entree est [main.py](main.py), qui instancie `App`. Les chargements de ressources dans [data/app.py](data/app.py) et [data/player.py](data/player.py) utilisent des chemins relatifs; si les textures ne se chargent pas, ajuster le dossier de lancement.
 
 ### Sauvegarde
 - Sauvegarde manuelle via le bouton Save du menu.
@@ -56,3 +56,18 @@ Prerequis: Python 3 et Pyxel installe. Le point d'entree est [main.py](main.py),
 - [Textures/Perso/run.png](Textures/Perso/run.png) — sprite de course du joueur.
 - [Textures/Perso/attack 2 down and left.png](Textures/Perso/attack%202%20down%20and%20left.png) — sprite d'attaque bas/gauche.
 - [Textures/Perso/attack 2 right and up.png](Textures/Perso/attack%202%20right%20and%20up.png) — sprite d'attaque haut/droite.
+
+## 3. Fonctionnement technique
+
+**Classes**
+- 1.App - classe pour le jeu principal
+- 2.Coffres - classe pour les coffres
+- 3.Player - classe pour le joueur (Justin)
+- 4.Arrow - classe pour les flèches
+- 5.Inventory - classe pour l'inventaire
+- 6.Items - classe qui contient lz jeu principal
+
+**Atributs**
+
+
+**Méthodes**
