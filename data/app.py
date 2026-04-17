@@ -132,14 +132,14 @@ class App:
             # === POTIONS DE SOIN (4 tiers) ===
             # Format: ("potion", name, description, image_x, image_y, attributs, value, duration)
             # Tier 1 : petite potion, +20 PV instantané
-            31: ("potion", "Petite potion de soin",   "Restaure 20 PV instantanement.",                  128,  0, {"heal": True}, 20,  0),
+            31: ("potion", "Petite potion de soin",   "Restaure 20 PV instantanement.", 224,  224, {"heal": True}, 20,  0),
             # Tier 2 : potion normale, +50 PV instantané
-            32: ("potion", "Potion de soin",          "Restaure 50 PV instantanement.",                  128, 32, {"heal": True}, 50,  0),
+            32: ("potion", "Potion de soin",          "Restaure 50 PV instantanement.", 224, 174, {"heal": True}, 50,  0),
             # Tier 3 : grande potion, +100 PV instantané
-            33: ("potion", "Grande potion de soin",   "Restaure 100 PV instantanement.",                 128, 64, {"heal": True}, 100, 0),
+            33: ("potion", "Grande potion de soin",   "Restaure 100 PV instantanement.", 224, 114, {"heal": True}, 100, 0),
             # Tier 4 : potion supreme, soin progressif 20 PV/s pendant 10s (200 PV total)
-            34: ("potion", "Potion de soin supreme",  "Regenere 20 PV par seconde pendant 10 secondes.", 128, 96, {"heal": True}, 20, 10),
-        }
+            34: ("potion", "Potion de soin supreme",  "Regenere 20 PV par seconde pendant 10 secondes.", 224, 51, {"heal": True}, 20, 10),        
+    }
 
         
         # Coordonnees de spawn modifiables
@@ -211,7 +211,8 @@ class App:
             "lion":{"health": 200, "damage": 100, "height": 32, "width": 32, "color": 7, "xp_drop_range": (50,60), "loot_table": loot_tables["lion"],'texture':(0,125)},
             "renard":{"health": 100, "damage": 50, "height": 32, "width": 32, "color": 9, "xp_drop_range": (10, 20), "loot_table": loot_tables["renard"],'texture':(96,0)},
             "salamandre":{"health": 550, "damage": 150, "height": 32, "width": 32, "color": 10, "xp_drop_range": (100,150), "loot_table": loot_tables["salamandre"],'texture':(192,0)},
-            "tortue":{"health": 80, "damage": 40, "height": 32, "width": 32, "color": 11, "xp_drop_range": (25,35), "loot_table": loot_tables["tortue"],'texture':(96,128)}
+            "tortue":{"health": 80, "damage": 40, "height": 32, "width": 32, "color": 11, "xp_drop_range": (25,35), "loot_table": loot_tables["tortue"],'texture':(96,128)},
+            "boss":{"health": 1500, "damage": 250, "height": 32, "width": 32, "color": 10, "xp_drop_range": (100,150), "loot_table": loot_tables["salamandre"],'texture':(192,0)}
             }
         if zone is not None:
             # Cherche en boucle une position libre dans la zone : on tire des coordonnées aléatoires,

@@ -31,6 +31,8 @@ class Mob:
     def draw(self, app):
         self.screen_x = app.screen_center_x + (self.x - app.x_center) - self.width // 2
         self.screen_y = app.screen_center_y + (self.y - app.y_center) - self.height // 2
+        #scale sert à modifier la taille pour le boss de sorte à ce qu'il soit deux fois plus grand que les autres mobs.
+        scale=1
         if not self.type == "salamandre":
             dir_index = {'down': 0, 'left': 1, 'right': 2, 'up': 3}[self.direction]
             frame = pyxel.frame_count // 10 % 3 if not app.timestop and not self.passive else 0
@@ -41,8 +43,13 @@ class Mob:
             s={'down':[(192,0),(192,127),(224,126)],'left':[(192,30),(192,159),(224,158)],'right':[(192,64),(192,189),(224,191)], 'up':[(192,96),(192,224),(224,223)]}[self.direction]
             frame = pyxel.frame_count // 10 % 3 if not app.timestop and not self.passive else 0
             u,v=s[frame][0],s[frame][1]
+        elif self.type == "boss":
+            s={'down':[(192,0),(192,127),(224,126)],'left':[(192,30),(192,159),(224,158)],'right':[(192,64),(192,189),(224,191)], 'up':[(192,96),(192,224),(224,223)]}[self.direction]
+            frame = pyxel.frame_count // 10 % 3 if not app.timestop and not self.passive else 0
+            u,v=s[frame][0],s[frame][1]
+            scale=2
 
-        pyxel.blt(self.screen_x, self.screen_y, 2, u, v, self.width, self.height, colkey=8)
+        pyxel.blt(self.screen_x, self.screen_y, 2, u, v, self.width, self.height, colkey=8, scale=scale)
 
     # Gère tous les déplacements du mob à chaque frame : knockback, détection du joueur,
     # recalcul du chemin BFS et suivi case par case.
