@@ -8,6 +8,7 @@ class Item:
         self.description = description
         self.image_x = image_x
         self.image_y = image_y
+        self.image_bank = 0
         self.durability = 100
         self.colkey = 0
         self.type = None
@@ -37,7 +38,9 @@ class Potion(Item):
     def __init__(self, name, description, image_x, image_y, attributs, value, duration=0):
         super().__init__(name, description, image_x, image_y)
         self.type = "potion"
+        self.image_bank = 1
         self.liste_attributs = attributs
+        self.colkey = 3
         self.value = value
         self.duration = duration
 

@@ -60,16 +60,14 @@ class Inventory:
                     continue
                 if idx is None:
                     continue
-
-                # Calcul de la position à l'écran : les slots "arme"/"armure" ont des positions fixes,
-                # les cases numérotées sont calculées selon leur rang dans la grille (ligne = idx//6, colonne = idx%6).
                 if type(idx) == str:
                     sx = px + 10 if idx == "arme" else px + 50
                     sy = py + 88
                 else:
                     sx = px + 100 + (idx % 6) * 36
                     sy = py + 16 + (idx // 6) * 36
-                pyxel.blt(sx, sy, 0, item.image_x, item.image_y, 32, 32, colkey=item.colkey)
+                img_bank = getattr(item, 'image_bank', 0)
+                pyxel.blt(sx, sy, img_bank, item.image_x, item.image_y, 32, 32, colkey=item.colkey)
             self.show_drag_item()
 
     # Renvoie l'identifiant de la case de l'inventaire sous le curseur souris, ou None si aucune.
@@ -133,7 +131,8 @@ class Inventory:
     def show_drag_item(self):
         if self.dragging_item is not None:
             mx, my = pyxel.mouse_x, pyxel.mouse_y
-            pyxel.blt(mx - 16, my - 16, 0, self.dragging_item.image_x, self.dragging_item.image_y, 32, 32, colkey=self.dragging_item.colkey)
+            img_bank = getattr(self.dragging_item, 'image_bank', 0)
+            pyxel.blt(mx - 16, my - 16, img_bank, self.dragging_item.image_x, self.dragging_item.image_y, 32, 32, colkey=self.dragging_item.colkey)
 
     # Affiche un tooltip (bulle d'info) avec le nom, la description et les stats de l'item survolé.
     # La position du tooltip s'adapte pour rester dans les limites de l'écran.
