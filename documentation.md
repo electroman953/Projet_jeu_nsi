@@ -1,5 +1,9 @@
 # Documentation du Justin's Journey
 
+## 0. Disclaimers
+Dans le code de ce jeu, l'anglais et le français sont constamment utilisés. Cela est simplement notre manière de coder et n'est pas une erreur. Le code est aussi parfois mal organisé pour les créations de variable.
+*truc a modifier sur l'ia*
+
 ## 1. Presentation generale
 Jeu d'action top-down realise avec Pyxel. Le joueur, qui s'appelle justin, explore une carte tilemap, affronte des mobs, recupere des objets, gere un inventaire et peut activer un mode de timestop. La boucle principale passe par trois etats: menu, jeu, mort. La progression se fait via l'XP et les niveaux, avec des armes (corps-a-corps ou distance) et des armures qui modifient les stats.
 
@@ -65,7 +69,15 @@ Prerequis: Python 3 et Pyxel 2.9.0 installe. Le point d'entree est [main.py](mai
 - 3.Player - classe pour le joueur (Justin)
 - 4.Arrow - classe pour les flèches
 - 5.Inventory - classe pour l'inventaire
-- 6.Items - classe qui contient lz jeu principal
+- 6.Items - classe pour les items
+- 7.Potions - classe pour les potions héréditaire de items
+- 8.Weapons - classe pour les armes héréditaire de items
+- 9.Armor - classe pour les armures héréditaire de items
+- 10.sword - classe pour les épées héréditaire de weapons
+- 11.bow - classe pour les arcs héréditaire de weapons
+- 12.Mob - classe pour les monstres
+- 13.World - classe pour le monde
+- 14.Zone - classe pour les zones
 
 **Atributs**
 
