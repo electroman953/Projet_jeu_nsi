@@ -6,18 +6,6 @@ class Inventory:
         self.items = {i : None for i in range(24)}
         self.items["arme"] = None
         self.items["armure"] = None
-        for i in range(1, 21):
-            if i in app.items:
-                item_data = app.items[i]
-                item_type_str = item_data[0]
-                if item_type_str == "sword":
-                    self.items[i-1] = sword(*item_data[1:5], item_data[5], **item_data[6])
-                elif item_type_str == "staff":
-                    self.items[i-1] = staff(*item_data[1:5], item_data[5], **item_data[6])
-                elif item_type_str == "bow":
-                    self.items[i-1] = bow(*item_data[1:5], item_data[5], **item_data[6])
-                elif item_type_str == "armor":
-                    self.items[i-1] = Armor(*item_data[1:5], item_data[5], **item_data[6])
         self.on_screen = False
         self.dragging_item = None
         self.old_drag_case = None

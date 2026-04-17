@@ -145,10 +145,9 @@ class App:
         self.coffres=[]
         self.coffres = [Coffre(1, "Coffre de base", 8*40 + 128, 8*40, 32, 32, 1), Coffre(2, "Coffre de luxe", 8*45, 8*45, 32, 32, 2)]
         self.inventory = Inventory(self)
-        # Potion de test dans le premier slot libre
-        potion_test = self.build_item(31)  # Petite potion de soin
-        if potion_test:
-            self.inventory.add_item(potion_test)
+        # Items de départ
+        self.inventory.add_item(self.build_item(2))   # Dague azurée (sword tier 1)
+        self.inventory.add_item(self.build_item(31))  # Petite potion de soin
         self.player = Player()
         self.player_x_abs, self.player_y_abs = self.spawn_x, self.spawn_y
         self.world = World(self.width, self.height,0)
