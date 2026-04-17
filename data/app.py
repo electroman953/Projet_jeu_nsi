@@ -74,12 +74,6 @@ class App:
             0xAAAAAA, 0x83769C, 0xFF77A8, 0xFFCCAA   
         ]
         self.items = {
-            # === STAFFS ===
-            # Starter : 5-6 coups normal
-            1:  ("staff", "Baton de novice",     "Un simple baton en bois, grave de runes pales.",                        0,   0,  8,  {"crit_chance_bonus": 0.0,  "crit_multiplier_bonus": 0.0}),
-            # Mid : ~3 coups normal, two-shot crit
-            10: ("staff", "Sceptre de crane",    "Un sceptre orne d'un crane demoniaque qui pulse d'energie sombre.",    32, 128, 22, {"crit_chance_bonus": 0.07, "crit_multiplier_bonus": 0.2}),
-
             # === SWORDS ===
             # Tier 1 starter : ~5 coups normal
             2:  ("sword", "Dague azuree",        "Une dague legère à lame bleue, ideale pour des attaques rapides.",      32,  0,  8, {"crit_chance_bonus": 0.0,  "crit_multiplier_bonus": 0.0,  "attack_speed_bonus": 0.3}),
@@ -111,16 +105,31 @@ class App:
             21: ("bow",   "Arc abyssal",         "Un arc forge dans les profondeurs, ses flèches dechirent l'air.",        64,  64, 35, {"crit_chance_bonus": 0.12, "crit_multiplier_bonus": 0.5,  "attack_speed_bonus": 0.1}),
 
             # === ARMORS ===
+            # Tier 1 starter
             18: ("armor", "Tunique de cuir",     "Une protection legère en cuir tanne.",                                   96,   0,  3, {"bonus_health": 10}),
             20: ("armor", "Cotte de mailles",    "Une armure en mailles d'acier, bon equilibre protection/poids.",         96,  32,  6, {"bonus_health": 15}),
+            # Tier 2 early-mid
             22: ("armor", "Plastron solide",     "Un plastron en acier renforce grave aux armes d'une vieille guilde.",    96,  64,  9, {"bonus_health": 20}),
             24: ("armor", "Armure de plaques",   "Une lourde armure de plaques qui repousse les coups les plus violents.", 96,  96, 12, {"bonus_health": 25}),
             25: ("armor", "Armure d'os",         "Façonnee d'os monstrueux, elle degage une aura intimidante.",            64, 128, 10, {"bonus_health": 20}),
+            # Tier 3 mid
             26: ("armor", "Armure demoniaque",   "Forgee aux enfers, elle brûle les attaquants qui la frôlent.",           96, 128, 14, {"bonus_health": 30}),
             27: ("armor", "Armure chitineuse",   "Taillee dans la carapace d'un colosse insectoïde.",                      64, 160, 12, {"bonus_health": 25}),
             28: ("armor", "Armure du seigneur",  "L'armure d'un seigneur de guerre, symbole de puissance absolue.",        96, 160, 16, {"bonus_health": 35}),
+            # Tier 4 endgame
             29: ("armor", "Armure abyssale",     "Une armure noire profonde qui absorbe la lumière et les coups.",         64, 192, 18, {"bonus_health": 30}),
             30: ("armor", "Armure legendaire",   "Le summum de l'artisanat, portee par les heros des ages anciens.",       64, 224, 22, {"bonus_health": 40}),
+
+            # === POTIONS DE SOIN (4 tiers) ===
+            # Format: ("potion", name, description, image_x, image_y, attributs, value, duration)
+            # Tier 1 : petite potion, +20 PV instantané
+            31: ("potion", "Petite potion de soin",   "Restaure 20 PV instantanement.",                  128,  0, {"heal": True}, 20,  0),
+            # Tier 2 : potion normale, +50 PV instantané
+            32: ("potion", "Potion de soin",          "Restaure 50 PV instantanement.",                  128, 32, {"heal": True}, 50,  0),
+            # Tier 3 : grande potion, +100 PV instantané
+            33: ("potion", "Grande potion de soin",   "Restaure 100 PV instantanement.",                 128, 64, {"heal": True}, 100, 0),
+            # Tier 4 : potion supreme, soin progressif 20 PV/s pendant 10s (200 PV total)
+            34: ("potion", "Potion de soin supreme",  "Regenere 20 PV par seconde pendant 10 secondes.", 128, 96, {"heal": True}, 20, 10),
         }
 
 
@@ -134,8 +143,12 @@ class App:
         self.projectiles = []
         self.mobs = []
         self.coffres=[]
-        self.coffres = [Coffre(1, "Coffre de base", 8*40 + 128, 8*40,32,32, "une potion de soin"), Coffre(2, "Coffre de luxe", 8*45, 8*45,32,32, "une épée de foudre")]
+        self.coffres = [Coffre(1, "Coffre de base", 8*40 + 128, 8*40, 32, 32, 1), Coffre(2, "Coffre de luxe", 8*45, 8*45, 32, 32, 2)]
         self.inventory = Inventory(self)
+        # Potion de test dans le premier slot libre
+        potion_test = self.build_item(31)  # Petite potion de soin
+        if potion_test:
+            self.inventory.add_item(potion_test)
         self.player = Player()
         self.player_x_abs, self.player_y_abs = self.spawn_x, self.spawn_y
         self.world = World(self.width, self.height,0)
@@ -175,10 +188,14 @@ class App:
         self.mobs.append(Mob(type[monstre]["health"], type[monstre]["damage"], monstre, x, y, type[monstre]["width"], type[monstre]["height"], type[monstre]["color"], type[monstre]["xp_drop_range"], type[monstre]["loot_table"], type[monstre]["texture"], zone.name))
     def check_potions(self):
         if pyxel.frame_count % 60 == 0:
-            for potion in self.potion_active:
+            for potion in self.potion_active[:]:
+                if "heal" in potion["effect"]:
+                    self.player.regen(self, potion["value"])
                 potion["duration"] -= 1
                 if potion["duration"] <= 0:
                     self.potion_active.remove(potion)
+            self.player.speed_bonus = sum(p["value"] for p in self.potion_active if "speed" in p["effect"])
+            self.player.speed = self.player.base_speed + self.player.speed_bonus
     def check_mobs(self):
         for zone in self.zones:
             while len([mob for mob in self.mobs if mob.spawn_zone == zone.name]) < zone.max_mob:
@@ -233,6 +250,7 @@ class App:
                     self.sword_cooldown = max(0, round(self.sword_cooldown - 0.1, 1))
                 if self.i_frames > 0:
                     self.i_frames = max(0, round(self.i_frames - 0.1, 1))
+            self.check_potions()
             if pyxel.frame_count % 30 == 0:
                 for i in self.projectiles:
                     i.supprimer(self)
@@ -451,6 +469,24 @@ class App:
         save_path = os.path.join(os.path.dirname(__file__), 'savegame.json')
         with open(save_path, 'w') as f:
             json.dump(data, f)
+    def build_item(self, item_id):
+        """Construit un objet Item à partir d'un item_id dans self.items."""
+        if item_id not in self.items:
+            return None
+        from data.items import sword, bow, Armor, Potion
+        item_data = self.items[item_id]
+        item_type_str = item_data[0]
+        if item_type_str == "sword":
+            return sword(*item_data[1:5], item_data[5], **item_data[6])
+        elif item_type_str == "bow":
+            return bow(*item_data[1:5], item_data[5], **item_data[6])
+        elif item_type_str == "armor":
+            return Armor(*item_data[1:5], item_data[5], **item_data[6])
+        elif item_type_str == "potion":
+            # Format: ("potion", name, description, image_x, image_y, attributs, value, duration)
+            return Potion(item_data[1], item_data[2], item_data[3], item_data[4], item_data[5], item_data[6], item_data[7])
+        return None
+
     def load_game(self):
         try:
             save_path = os.path.join(os.path.dirname(__file__), 'savegame.json')
@@ -471,23 +507,12 @@ class App:
             for slot, item_id in data["inventory"]["items"].items():
                 if str(slot).isdigit():
                     slot = int(slot)
-                if item_id is not None and int(item_id) in self.items:
-                    # items are stored in self.items as a tuple 
-                    # 1:  ("staff", "Baton de novice", "Un simple baton en bois, grave de runes pales.", 0, 0, 8, {"crit_chance_bonus": 0.0, "crit_multiplier_bonus": 0.0})
-                    # the first element is the item type string
-                    item_data = self.items[int(item_id)]
-                    item_type_str = item_data[0]
-                    if item_type_str in ["sword", "staff", "bow"]:
-                        from data.items import sword, staff, bow
-                        if item_type_str == "sword":
-                            self.inventory.items[slot] = sword(*item_data[1:5], item_data[5], **item_data[6])
-                        elif item_type_str == "staff":
-                            self.inventory.items[slot] = staff(*item_data[1:5], item_data[5], **item_data[6])
-                        elif item_type_str == "bow":
-                            self.inventory.items[slot] = bow(*item_data[1:5], item_data[5], **item_data[6])
-                    elif item_type_str == "armor":
-                        from data.items import Armor
-                        self.inventory.items[slot] = Armor(*item_data[1:5], item_data[5], **item_data[6])
+                if item_id is not None:
+                    try:
+                        item_obj = self.build_item(int(item_id))
+                        self.inventory.items[slot] = item_obj
+                    except (ValueError, TypeError):
+                        self.inventory.items[slot] = None
                 else:
                     self.inventory.items[slot] = None
         except (FileNotFoundError, KeyError, json.JSONDecodeError):

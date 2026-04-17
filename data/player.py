@@ -4,6 +4,8 @@ class Player:
 
     def __init__(self):
         self.speed = 2*pyxel.sqrt(2)
+        self.base_speed = self.speed
+        self.speed_bonus = 0
         self.width = 19
         self.height = 34
         self.direction = "down"
@@ -26,7 +28,6 @@ class Player:
         self.level = 1
 
     def deplace(self, app):
-        #coordonnées du joueur relatif à l'écran
         temp_speed = int(self.speed + 1)
         xp_r = app.screen_center_x + (app.player_x_abs - app.x_center) - self.width//2
         yp_r = app.screen_center_y + (app.player_y_abs - app.y_center) - self.height//2
@@ -36,7 +37,6 @@ class Player:
             self.direction = "up"
             self.run = True
             for i in range(temp_speed):
-                # On teste uniquement l'axe Y pour permettre de glisser sur les murs verticaux
                 if not self.next_dest_is_blocked(app, 0, player_y_abs - 1):
                     player_y_abs -= 1
                 else:
@@ -55,7 +55,6 @@ class Player:
             self.direction = "left"
             self.run = True
             for i in range(temp_speed):
-                # On teste uniquement l'axe X pour glisser sur les murs horizontaux
                 if not self.next_dest_is_blocked(app, player_x_abs - 1, 0):
                     player_x_abs -= 1
                 else:
@@ -104,10 +103,13 @@ class Player:
             app.inventory.open(app)
         if app.inventory.on_screen and pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
             app.inventory.drag_item(app)
+        if app.inventory.on_screen and pyxel.btnp(pyxel.KEY_E):
+            app.inventory.use_item(app)
         if pyxel.btnp(pyxel.KEY_DELETE):
             app.inventory.supprimer_item()
         if pyxel.btnp(pyxel.KEY_M):
             app.on_menu = True
+
     def collision_rect(self, x1, y1, w1, h1, x2, y2, w2, h2):
         return (x1 < x2 + w2 and
                 x1 + w1 > x2 and
@@ -118,7 +120,7 @@ class Player:
         if app.i_frames==0:
             print('AIE')
             defense = self.get_current_defense(app)
-            actual_damage = max(1, n - defense)  # minimum 1 damage
+            actual_damage = max(1, n - defense)
             self.s_dmg=0.1
             self.health=max(0,self.health-actual_damage)
             app.i_frames = app.invincible_timer
@@ -160,7 +162,11 @@ class Player:
         next_y = app.player_y_abs + dy
         for c in app.coffres:
             if not c.ouvert and self.collision_rect(next_x, next_y, self.width, self.height//2, c.x, c.y, c.width, c.height):
-                print(c.ouvrir())
+                item_id = c.ouvrir()  # retourne maintenant un item_id (int)
+                if item_id is not None:
+                    item_obj = app.build_item(item_id)  # convertit l'ID en objet Item
+                    if item_obj is not None:
+                        app.inventory.add_item(item_obj)
                 return
         
     def next_dest_is_chest(self, app, dx, dy):
@@ -182,8 +188,8 @@ class Player:
             self.base_defense += 2
             self.base_critical_chance += 0.05
             self.base_critical_multiplier += 0.2
+
     def draw(self, app):
-        #coordonnées du joueur relatif à l'écran
         self.player_screen_x = app.screen_center_x + (app.player_x_abs - app.x_center) - self.width//2
         self.player_screen_y = app.screen_center_y + (app.player_y_abs - app.y_center) - self.height//2
         idle_animation_frame = (pyxel.frame_count // 10) % 8

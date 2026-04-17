@@ -72,7 +72,3 @@ class bow(Weapon):
             app.add_player_projectile("arrow", "basic")
             app.bow_cooldown = app.BOW_COOLDOWN - self.liste_attributs["attack_speed_bonus"]
 
-class staff(Weapon):
-    def __init__(self, name, description, image_x, image_y, damage, crit_chance_bonus=0.05, crit_multiplier_bonus=0.5, attack_speed_bonus=0.2):
-        super().__init__(name, description, image_x, image_y, damage, crit_chance_bonus=crit_chance_bonus, crit_multiplier_bonus=crit_multiplier_bonus, attack_speed_bonus=attack_speed_bonus)
-        self.type = "staff"

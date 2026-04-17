@@ -1,5 +1,5 @@
 import pyxel
-from data.items import sword, bow, staff, Armor, Weapon
+from data.items import sword, bow, Armor, Weapon, Potion
 
 class Inventory:
     def __init__(self, app):
@@ -157,3 +157,15 @@ class Inventory:
             self.items[case] = None
             return True
         return False
+    def use_item(self, app):
+        case = self.récuperer_case_souris()
+        if case is not None and self.items[case] is not None and self.items[case].type == "potion":
+            potion = self.items[case]
+            self.items[case] = None
+            if potion.duration == 0:
+                # Potion instantanée : applique l'effet immédiatement
+                if "heal" in potion.liste_attributs:
+                    app.player.regen(app, potion.value)
+            else:
+                # Potion à durée : ajoute à la liste des effets actifs
+                app.potion_active.append({"effect": potion.liste_attributs, "value": potion.value, "duration": potion.duration})
