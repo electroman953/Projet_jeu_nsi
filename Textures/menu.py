@@ -2,7 +2,16 @@ import pyxel
 
 class Menu():
     def __init__(self):
-        pass
+        #x1, y1, x2, y2
+        self.start_button = (96, 110, 241, 138)
+        self.save_button = (96, 160, 241, 188)
+    def check_menu_click(self, app):
+        mx, my = pyxel.mouse_x, pyxel.mouse_y
+        if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
+            if self.start_button[0] < mx < self.start_button[2] and self.start_button[1] < my < self.start_button[3]:
+                app.start_game()
+            elif self.save_button[0] < mx < self.save_button[2] and self.save_button[1] < my < self.save_button[3]:
+                app.save_game()
 
     def draw_menu(self):
         pyxel.cls(0)

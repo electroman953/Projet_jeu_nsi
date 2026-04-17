@@ -59,7 +59,7 @@ class Inventory:
                 else:
                     sx = 180 + (idx % 6) * 36
                     sy = 56 + (idx // 6) * 36
-                pyxel.blt(sx, sy, 2, item.image_x, item.image_y, 32, 32, colkey=item.colkey)
+                pyxel.blt(sx, sy, 0, item.image_x, item.image_y, 32, 32, colkey=item.colkey)
             self.show_drag_item()
     def récuperer_case_souris(self):
         if not self.on_screen:
@@ -112,7 +112,7 @@ class Inventory:
     def show_drag_item(self):
         if self.dragging_item is not None:
             mx, my = pyxel.mouse_x, pyxel.mouse_y
-            pyxel.blt(mx - 16, my - 16, 2, self.dragging_item.image_x, self.dragging_item.image_y, 32, 32, colkey=self.dragging_item.colkey)
+            pyxel.blt(mx - 16, my - 16, 0, self.dragging_item.image_x, self.dragging_item.image_y, 32, 32, colkey=self.dragging_item.colkey)
     def over_item(self, app):
         case = self.récuperer_case_souris()
         if case is None:

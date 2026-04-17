@@ -1,9 +1,11 @@
 import pyxel
 import random
+import json
 from data.world import World
 from data.player import Player
 from data.inventory import Inventory
 from data.mob import Mob
+from data.items import Item
 from data.arrow import Arrow
 from data.coffre import Coffre
 from data.zone import Zone
@@ -13,6 +15,7 @@ class App:
     
     def __init__(self):
         self.start()
+        self.load_game()
         pyxel.init(self.width, self.height, title = "Jeu du heros", fps=60)
         pyxel.load('../Textures/res.pyxres')
         print(pyxel.VERSION)
@@ -30,6 +33,7 @@ class App:
         self.timestop = False
         self.TIMESTOP_DURATION = 5
         self.TIMESTOP_COOLDOWN = 10
+        self.game_started = True
         self.BOW_COOLDOWN = .9
         self.bow_cooldown = 0
         self.SWORD_COOLDOWN = .5
@@ -198,9 +202,7 @@ class App:
         else:
             self.player.colkey = 5
         if self.on_menu:
-            if (224<pyxel.mouse_x<288 and 116<pyxel.mouse_y<148 and pyxel.btnr(pyxel.MOUSE_BUTTON_LEFT)) or pyxel.btnr(pyxel.KEY_SPACE):
-                self.on_menu=False
-                pyxel.colors[:] = self.palette_normal
+            self.menu.check_menu_click(self)
         elif self.player.is_dead():
             if (224<pyxel.mouse_x<288 and 116<pyxel.mouse_y<148 and pyxel.btnr(pyxel.MOUSE_BUTTON_LEFT)) or pyxel.btnr(pyxel.KEY_SPACE):
                 self.start()
@@ -411,3 +413,56 @@ class App:
     def draw_coffres(self):
         for i in self.coffres:
             i.draw(self)
+    def start_game(self):
+        self.on_menu = False
+        if not self.game_started:
+            self.game_started = False
+        pyxel.colors[:] = self.palette_normal
+    def save_game(self):
+        data = {
+            "player": {
+                "x": self.player_x_abs,
+                "y": self.player_y_abs,
+                "health": self.player.health,
+                "experience": self.player.experience,
+                "level": self.player.level,
+                "base_damage": self.player.base_damage,
+                "base_critical_chance": self.player.base_critical_chance,
+                "base_critical_multiplier": self.player.base_critical_multiplier
+            },
+            "inventory": {
+                "items": {
+                    slot: next((k for k, v in self.items.items() if item and v[1] == item.name), None)
+                    for slot, item in self.inventory.items.items()
+                }
+            },
+            "mobs": [
+                {"x": mob.x, "y": mob.y, "health": mob.health}
+                for mob in self.mobs if mob.health > 0
+            ]
+        }
+        with open('savegame.json', 'w') as f:
+            json.dump(data, f)
+    def load_game(self):
+        try:
+            with open('savegame.json', 'r') as f:
+                data = json.load(f)
+            
+            self.player_x_abs = data["player"]["x"]
+            self.player_y_abs = data["player"]["y"]
+            self.x_center = self.player_x_abs
+            self.y_center = self.player_y_abs
+            self.player.health = data["player"]["health"]
+            self.player.experience = data["player"]["experience"]
+            self.player.level = data["player"]["level"]
+            self.player.base_damage = data["player"]["base_damage"]
+            self.player.base_critical_chance = data["player"]["base_critical_chance"]
+            self.player.base_critical_multiplier = data["player"]["base_critical_multiplier"]
+            
+            for slot, item_id in data["inventory"]["items"].items():
+                if item_id is not None and item_id in self.items:
+                    self.inventory.items[slot] = Item(item_id, *self.items[item_id])
+                else:
+                    self.inventory.items[slot] = None
+        except (FileNotFoundError, KeyError, json.JSONDecodeError):
+            pass

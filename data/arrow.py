@@ -16,7 +16,7 @@ class Arrow:
     def draw(self, app):
         screen_x = app.screen_center_x + (self.x - app.x_center)
         screen_y = app.screen_center_y + (self.y - app.y_center)
-        pyxel.blt(screen_x - 16, screen_y - 16, 2, 96, 192, 32, 32, 3, self.rotation, self.scale)
+        pyxel.blt(screen_x - 16, screen_y - 16, 0, 96, 192, 32, 32, 3, self.rotation, self.scale)
     def move(self):
         self.x += self.direction[0] * self.speed
         self.y += self.direction[1] * self.speed
