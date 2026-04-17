@@ -31,7 +31,7 @@ class Inventory:
             # Aperçu du personnage à gauche du panneau.
             pyxel.rect(px+16, py+12, 48, 64, 5)
             pyxel.rectb(px+16, py+12, 48, 64, 6)
-            pyxel.blt(px+28, py+20, 0, 0, 0, 23, 39, colkey=3) 
+            pyxel.blt(px+28, py+20, 1, 70, 222, 23, 39, colkey=3) 
 
             # Deux slots d'équipement (arme et armure) sous l'aperçu.
             for i in range(2):

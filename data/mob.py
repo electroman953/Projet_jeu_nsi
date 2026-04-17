@@ -33,12 +33,7 @@ class Mob:
         self.screen_y = app.screen_center_y + (self.y - app.y_center) - self.height // 2
         #scale sert à modifier la taille pour le boss de sorte à ce qu'il soit deux fois plus grand que les autres mobs.
         scale=1
-        if not self.type == "salamandre":
-            dir_index = {'down': 0, 'left': 1, 'right': 2, 'up': 3}[self.direction]
-            frame = pyxel.frame_count // 10 % 3 if not app.timestop and not self.passive else 0
-            u = self.texture[0] + 32 * frame
-            v = self.texture[1] + 32 * dir_index
-        elif self.type == "salamandre":
+        if self.type == "salamandre":
             # Chaque direction a ses propres coordonnées de frames dans la spritesheet
             s={'down':[(192,0),(192,127),(224,126)],'left':[(192,30),(192,159),(224,158)],'right':[(192,64),(192,189),(224,191)], 'up':[(192,96),(192,224),(224,223)]}[self.direction]
             frame = pyxel.frame_count // 10 % 3 if not app.timestop and not self.passive else 0
@@ -47,7 +42,12 @@ class Mob:
             s={'down':[(192,0),(192,127),(224,126)],'left':[(192,30),(192,159),(224,158)],'right':[(192,64),(192,189),(224,191)], 'up':[(192,96),(192,224),(224,223)]}[self.direction]
             frame = pyxel.frame_count // 10 % 3 if not app.timestop and not self.passive else 0
             u,v=s[frame][0],s[frame][1]
-            scale=2
+            scale=3
+        else:
+            dir_index = {'down': 0, 'left': 1, 'right': 2, 'up': 3}[self.direction]
+            frame = pyxel.frame_count // 10 % 3 if not app.timestop and not self.passive else 0
+            u = self.texture[0] + 32 * frame
+            v = self.texture[1] + 32 * dir_index
 
         pyxel.blt(self.screen_x, self.screen_y, 2, u, v, self.width, self.height, colkey=8, scale=scale)
 
@@ -181,6 +181,9 @@ class Mob:
     # puis supprime le mob de la liste. Renvoie implicitement None.
     def is_dead(self, app):
         if self.health == 0:
+            if self.type == "boss":
+                app.game_won = True
+                
             xp_drop = pyxel.rndi(self.xp_drop_range[0], self.xp_drop_range[1])
             app.player.experience += xp_drop
             print(app.player.experience)

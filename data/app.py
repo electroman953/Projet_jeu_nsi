@@ -28,6 +28,7 @@ class App:
     # Crée les zones, la palette de couleurs, l'inventaire de départ et les coffres.
     def start(self):
         self.on_menu = True
+        self.game_won = False
         self.palette_menu = [
             0x000000, 0xFCDED7, 0xE87C3C, 0xFF9656, 0x49D35C,
             0x29204A, 0x563271, 0xDC576C, 0x417B1C, 0xF3A2AF, 
@@ -161,7 +162,8 @@ class App:
         self.recentrer = False
         self.obstacle = []
         self.debug_hitbox = False
-        self.create_coffres()
+        self.boss_spawned = False
+        
 
     # Crée un mob du type demandé dans la zone donnée, à une position aléatoire sans obstacle.
     # La double boucle de vérification teste plusieurs points autour du centre pour éviter
@@ -234,7 +236,7 @@ class App:
                     break
         else:
             x, y = pyxel.rndi(0, self.width), pyxel.rndi(0, self.height)
-        self.mobs.append(Mob(type[monstre]["health"], type[monstre]["damage"], monstre, x, y, type[monstre]["width"], type[monstre]["height"], type[monstre]["color"], type[monstre]["xp_drop_range"], type[monstre]["loot_table"], type[monstre]["texture"], zone.name))
+        self.mobs.append(Mob(type[monstre]["health"], type[monstre]["damage"], monstre, x, y, type[monstre]["width"], type[monstre]["height"], type[monstre]["color"], type[monstre]["xp_drop_range"], type[monstre]["loot_table"], type[monstre]["texture"], None if zone is None else zone.name))
 
     # Place un coffre à une position aléatoire valide dans chaque zone, en vérifiant
     # qu'aucun point de sa hitbox ne tombe sur un obstacle. Même logique que create_mobs.
@@ -283,6 +285,12 @@ class App:
     # et les appels aux systèmes de déplacement et d'armes.
     def update(self):
         self.player.level_up(self)
+        if self.player.level >= 20 and not self.boss_spawned:
+            self.create_mobs("boss", None)
+            self.mobs[-1].x = self.player_x_abs + 100
+            self.mobs[-1].y = self.player_y_abs + 100
+            self.boss_spawned = True
+            
         if self.timestop:
             self.player.colkey = 3
         else:
@@ -355,6 +363,11 @@ class App:
                 if self.timestop_timer == 0:
                     self.timestop = False
                     self.recentrer = True
+
+        if getattr(self, "game_won", False):
+            if pyxel.btnp(pyxel.KEY_SPACE):
+                self.game_won = False
+            return
             
     # Boucle de rendu appelée à chaque frame. Gère les trois états visuels :
     # menu d'accueil, écran de mort, et jeu en cours (carte, entités, HUD, inventaire).
@@ -367,6 +380,10 @@ class App:
             pyxel.cls(0)
             pyxel.mouse(True)
             self.menu.draw_menu_dead()
+        elif getattr(self, "game_won", False):
+            pyxel.cls(0)
+            pyxel.text(self.width // 2 - 40, self.height // 2 - 10, "BRAVO VOUS AVEZ GAGNE !", 7)
+            pyxel.text(self.width // 2 - 50, self.height // 2 + 10, "Appuyez sur ESPACE pour continuer", 7)
         else:
             pyxel.cls(0)
 
@@ -564,10 +581,7 @@ class App:
                 {"x": mob.x, "y": mob.y, "health": mob.health}
                 for mob in self.mobs if mob.health > 0
             ],
-            "coffres": [
-                {"id": c.id, "ouvert": c.ouvert, "contenu": c.contenu}
-                for c in self.coffres
-            ]
+            "boss_spawned": self.boss_spawned
         }
         save_path = os.path.join(os.path.dirname(__file__), 'savegame.json')
         with open(save_path, 'w') as f:
@@ -610,9 +624,8 @@ class App:
             self.player.base_damage = data["player"]["base_damage"]
             self.player.base_critical_chance = data["player"]["base_critical_chance"]
             self.player.base_critical_multiplier = data["player"]["base_critical_multiplier"]
+            self.boss_spawned = data.get("boss_spawned", False)
             
-            # Les clés des slots d'inventaire sont sauvegardées en string dans le JSON,
-            # on les reconvertit en int pour les slots numériques avant de réassigner les items.
             for slot, item_id in data["inventory"]["items"].items():
                 if str(slot).isdigit():
                     slot = int(slot)
