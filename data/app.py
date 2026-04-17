@@ -1,6 +1,7 @@
 import pyxel
 import random
 import json
+import os
 from data.world import World
 from data.player import Player
 from data.inventory import Inventory
@@ -208,6 +209,10 @@ class App:
             if (224<pyxel.mouse_x<288 and 116<pyxel.mouse_y<148 and pyxel.btnr(pyxel.MOUSE_BUTTON_LEFT)) or pyxel.btnr(pyxel.KEY_SPACE):
                 self.start()
         else:
+            if pyxel.frame_count % 1500 == 0:
+                print("Autosaving game...")
+                self.save_game()
+                
             if pyxel.btnp(pyxel.KEY_H):
                 self.debug_hitbox = not self.debug_hitbox
             self.player.check_key(self)
@@ -378,8 +383,8 @@ class App:
     def load_walls(self):
         self.obstacle = []
         
-        for x in range(self.x_center - self.width//2, self.x_center + self.width//2, 8):
-            for y in range(self.y_center - self.height//2, self.y_center + self.height//2, 8):                
+        for x in range(int(self.x_center) - self.width//2, int(self.x_center) + self.width//2, 8):
+            for y in range(int(self.y_center) - self.height//2, int(self.y_center) + self.height//2, 8):                
                 
                 if pyxel.tilemaps[self.world.tm].pget(x // 8, y // 8) in self.elt_col:
                     self.obstacle.append((x//8, y//8))
@@ -420,6 +425,7 @@ class App:
             self.game_started = False
         pyxel.colors[:] = self.palette_normal
     def save_game(self):
+        print("Saving game...")
         data = {
             "player": {
                 "x": self.player_x_abs,
@@ -442,11 +448,13 @@ class App:
                 for mob in self.mobs if mob.health > 0
             ]
         }
-        with open('savegame.json', 'w') as f:
+        save_path = os.path.join(os.path.dirname(__file__), 'savegame.json')
+        with open(save_path, 'w') as f:
             json.dump(data, f)
     def load_game(self):
         try:
-            with open('savegame.json', 'r') as f:
+            save_path = os.path.join(os.path.dirname(__file__), 'savegame.json')
+            with open(save_path, 'r') as f:
                 data = json.load(f)
             
             self.player_x_abs = data["player"]["x"]
@@ -461,8 +469,25 @@ class App:
             self.player.base_critical_multiplier = data["player"]["base_critical_multiplier"]
             
             for slot, item_id in data["inventory"]["items"].items():
-                if item_id is not None and item_id in self.items:
-                    self.inventory.items[slot] = Item(item_id, *self.items[item_id])
+                if str(slot).isdigit():
+                    slot = int(slot)
+                if item_id is not None and int(item_id) in self.items:
+                    # items are stored in self.items as a tuple 
+                    # 1:  ("staff", "Baton de novice", "Un simple baton en bois, grave de runes pales.", 0, 0, 8, {"crit_chance_bonus": 0.0, "crit_multiplier_bonus": 0.0})
+                    # the first element is the item type string
+                    item_data = self.items[int(item_id)]
+                    item_type_str = item_data[0]
+                    if item_type_str in ["sword", "staff", "bow"]:
+                        from data.items import sword, staff, bow
+                        if item_type_str == "sword":
+                            self.inventory.items[slot] = sword(*item_data[1:5], item_data[5], **item_data[6])
+                        elif item_type_str == "staff":
+                            self.inventory.items[slot] = staff(*item_data[1:5], item_data[5], **item_data[6])
+                        elif item_type_str == "bow":
+                            self.inventory.items[slot] = bow(*item_data[1:5], item_data[5], **item_data[6])
+                    elif item_type_str == "armor":
+                        from data.items import Armor
+                        self.inventory.items[slot] = Armor(*item_data[1:5], item_data[5], **item_data[6])
                 else:
                     self.inventory.items[slot] = None
         except (FileNotFoundError, KeyError, json.JSONDecodeError):

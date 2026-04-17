@@ -7,7 +7,17 @@ class Inventory:
         self.items["arme"] = None
         self.items["armure"] = None
         for i in range(1, 21):
-            self.items[i] = make_item(app.items[i])
+            if i in app.items:
+                item_data = app.items[i]
+                item_type_str = item_data[0]
+                if item_type_str == "sword":
+                    self.items[i-1] = sword(*item_data[1:5], item_data[5], **item_data[6])
+                elif item_type_str == "staff":
+                    self.items[i-1] = staff(*item_data[1:5], item_data[5], **item_data[6])
+                elif item_type_str == "bow":
+                    self.items[i-1] = bow(*item_data[1:5], item_data[5], **item_data[6])
+                elif item_type_str == "armor":
+                    self.items[i-1] = Armor(*item_data[1:5], item_data[5], **item_data[6])
         self.on_screen = False
         self.dragging_item = None
         self.old_drag_case = None
@@ -48,17 +58,18 @@ class Inventory:
             self.afficher_items()
     def afficher_items(self):
         if self.on_screen:
+            px, py = 80, 40
             for idx, item in self.items.items():
                 if item is None or (self.dragging_item is not None and idx == self.old_drag_case):
                     continue
                 if idx is None:
                     continue
                 if type(idx) == str:
-                    sx = 90 if idx == "arme" else 130
-                    sy = 128
+                    sx = px + 10 if idx == "arme" else px + 50
+                    sy = py + 88
                 else:
-                    sx = 180 + (idx % 6) * 36
-                    sy = 56 + (idx // 6) * 36
+                    sx = px + 100 + (idx % 6) * 36
+                    sy = py + 16 + (idx // 6) * 36
                 pyxel.blt(sx, sy, 0, item.image_x, item.image_y, 32, 32, colkey=item.colkey)
             self.show_drag_item()
     def récuperer_case_souris(self):
@@ -146,9 +157,3 @@ class Inventory:
             self.items[case] = None
             return True
         return False
-def make_item(data):
-    type_, name, desc, x, y, stat, *extra = data
-    bonus = extra[0] if extra else {}
-    constructors = {"sword": sword, "bow": bow, "staff": staff, "armor": Armor}
-    item = constructors[type_](name, desc, x, y, stat, **bonus)
-    return item
