@@ -26,7 +26,7 @@ class App:
         self.palette_menu = [
             0x000000, 0xFCDED7, 0xE87C3C, 0xFF9656, 0x49D35C,
             0x29204A, 0x563271, 0xDC576C, 0x417B1C, 0xF3A2AF, 
-            0xB8E416, 0xA7D10C, 0xF2B9A0, 0xEFAF8B, 0xCFCFCF, 
+            0xB8E416, 0xA7D10C, 0xCF1818, 0x9B1919, 0xCFCFCF, 
             0xFFFFFF
         ]
         self.menu = Menu()
@@ -204,6 +204,7 @@ class App:
         if self.on_menu:
             self.menu.check_menu_click(self)
         elif self.player.is_dead():
+            pyxel.colors[:] = self.palette_menu
             if (224<pyxel.mouse_x<288 and 116<pyxel.mouse_y<148 and pyxel.btnr(pyxel.MOUSE_BUTTON_LEFT)) or pyxel.btnr(pyxel.KEY_SPACE):
                 self.start()
         else:
@@ -263,11 +264,11 @@ class App:
         if self.on_menu:
             pyxel.cls(0)
             pyxel.mouse(True)
-            self.menu.draw_menu()
+            self.menu.draw_menu_accueil()
         elif self.player.is_dead():
             pyxel.cls(0)
-            pyxel.text(224, 100, 'You Died', 7)
-            pyxel.rect(224,116,64,32,7)
+            pyxel.mouse(True)
+            self.menu.draw_menu_dead()
         else:
             pyxel.cls(0)
 
