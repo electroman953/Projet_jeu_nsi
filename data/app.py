@@ -141,8 +141,7 @@ class App:
 
         self.projectiles = []
         self.mobs = []
-        self.coffres=[]
-        self.coffres = [Coffre(1, "Coffre de base", 8*40 + 128, 8*40, 32, 32, 1), Coffre(2, "Coffre de luxe", 8*45, 8*45, 32, 32, 2)]
+        self.coffres = []
         self.inventory = Inventory(self)
         # Items de départ
         self.inventory.add_item(self.build_item(2))   # Dague azurée (sword tier 1)
@@ -153,7 +152,7 @@ class App:
         self.recentrer = False
         self.obstacle = []
         self.debug_hitbox = False
-        
+        self.create_coffres()
 
     def create_mobs(self, monstre, zone=None):
         temp = []
@@ -222,6 +221,24 @@ class App:
         else:
             x, y = pyxel.rndi(0, self.width), pyxel.rndi(0, self.height)
         self.mobs.append(Mob(type[monstre]["health"], type[monstre]["damage"], monstre, x, y, type[monstre]["width"], type[monstre]["height"], type[monstre]["color"], type[monstre]["xp_drop_range"], type[monstre]["loot_table"], type[monstre]["texture"], zone.name))
+    def create_coffres(self):
+        for zone in self.zones:
+            for c in range(2):
+                while True:
+                    x = random.randint(zone.x, zone.x + zone.width)
+                    y = random.randint(zone.y, zone.y + zone.height)
+                    collision = False
+                    for i in range(-16, 17, 4):
+                        for j in range(-16, 17, 4):
+                            if pyxel.tilemaps[self.world.tm].pget((x + i) // 8, (y + j) // 8) in self.elt_col:
+                                collision = True
+                                break
+                        if collision:
+                            break
+                    if not collision:
+                        break
+                self.coffres.append(Coffre(len(self.coffres)+1, f"Coffre {len(self.coffres)+1}", x, y, 32, 32, zone.difficulty))
+
     def check_potions(self):
         if pyxel.frame_count % 60 == 0:
             for potion in self.potion_active[:]:
