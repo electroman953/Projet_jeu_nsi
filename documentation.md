@@ -2,6 +2,7 @@
 
 ## 0. Disclaimers
 Dans le code de ce jeu, l'anglais et le français sont constamment utilisés. Cela est simplement notre manière de coder et n'est pas une erreur. Le code est aussi parfois mal organisé pour les créations de variable.
+
 ## 1. Présentation générale
 Jeu d'action top-down réalisé avec Pyxel. Le joueur, qui s'appelle Justin, explore une carte tilemap, affronte des mobs, récupère des objets, gère un inventaire et peut activer un mode de timestop. La boucle principale passe par trois états : menu, jeu, mort. La progression se fait via l'XP et les niveaux, avec des armes (corps-à-corps ou distance) et des armures qui modifient les stats.
 
@@ -23,6 +24,9 @@ Prérequis : Python 3 et Pyxel 2.9.0 installé. Le point d'entrée est [main.py]
 - Supprimer un item : `DELETE`.
 - Debug hitboxes : `H`.
 - Retour menu : `M`.
+
+## Fin du jeu
+Le jeu prend fin après que le boss final soit vaincu. Celui-ci fait deux fois la taille d'une 'salamandre' et a des statistiques d'attaques largement supérieur.
 
 ---
 
