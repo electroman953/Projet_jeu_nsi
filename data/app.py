@@ -14,6 +14,8 @@ from Textures.menu import Menu
 
 class App:
     
+    # Point d'entrée du jeu : initialise l'état, charge la sauvegarde, crée la fenêtre Pyxel
+    # et lance la boucle principale (update + draw à 60 fps).
     def __init__(self):
         self.start()
         self.load_game()
@@ -22,6 +24,8 @@ class App:
         print(pyxel.VERSION)
         pyxel.run(self.update, self.draw)
 
+    # Initialise ou réinitialise toutes les variables du jeu (appelé au démarrage et à la mort du joueur).
+    # Crée les zones, la palette de couleurs, l'inventaire de départ et les coffres.
     def start(self):
         self.on_menu = True
         self.palette_menu = [
@@ -49,9 +53,11 @@ class App:
         self.width = 512
         self.potion_active = []
         self.height = 256
+        # Liste des coordonnées de tuiles (col, row) considérées comme obstacles (murs, arbres, eau...).
         self.elt_col = [ (21, 1), (21, 2), (21, 3), (21, 4), (21, 5), (21, 6), (21, 7), (21, 8), (21, 9), (21, 10), (22, 1), (22, 2), (22, 3), (22, 4), (22, 5), (22, 6), (22, 7), (22, 8), (22, 9), (22, 10), (21, 13), (21, 14), (22, 13), (22, 14), (1, 17), (1, 18), (2, 17), (2, 18), (3, 17), (3, 18), (4, 17), (4, 18), (5, 17), (5, 18), (6, 17), (6, 18), (7, 17), (7, 18), (8, 17), (8, 18), (9, 17), (9, 18), (10, 17), (10, 18), (12, 16), (12, 17), (12, 18), (12, 19), (13, 16), (13, 17), (13, 18), (13, 19), (14, 16), (14, 17), (14, 18), (14, 19), (15, 16), (15, 17), (15, 18), (15, 19), (16, 4), (16, 5), (16, 6), (16, 7), (16, 8), (16, 9), (17, 4), (17, 5), (17, 6), (17, 7), (17, 8), (17, 9), (18, 4), (18, 5), (18, 6), (18, 7), (18, 8), (18, 9), (19, 4), (19, 5), (19, 6), (19, 7), (19, 8), (19, 9)]
         self.screen_center_x = self.width // 2
         self.screen_center_y = self.height // 2
+        # Correspondance entre les clés internes des attributs et leurs noms affichés dans l'UI.
         self.correspondance_nom = {"damage" : "DMG", "crit_chance_bonus" : "CRIT CHANCE", "crit_multiplier_bonus" : "CRIT MULTIPLIER", "attack_speed_bonus" : "ATK SPEED", "defense" : "DEF", "bonus_health" : "HP"}
         self.zones = [
             Zone("Easy", ["tortue", "renard"], 1, 20, 0, 0, 1024, 1024),
@@ -67,12 +73,15 @@ class App:
         ]
 
         pyxel.colors[:] = self.palette_menu
+        # Palette alternative au look désaturé/gris, activée pendant le timestop.
         self.palette_timestop = [
             0x0D0D0D, 0x1D2B53, 0x7E2553, 0x008751,
             0xAB5236, 0x555555, 0xC2C3C7, 0xFFF1E8,  
             0xFF004D, 0xFFA300, 0xFFEC27, 0x00E436,
             0xAAAAAA, 0x83769C, 0xFF77A8, 0xFFCCAA   
         ]
+        # Dictionnaire central de tous les items du jeu, indexé par ID entier.
+        # Format : (type, nom, description, image_x, image_y, damage/defense, dict_attributs)
         self.items = {
             # === SWORDS ===
             # Tier 1 starter : ~5 coups normal
@@ -154,6 +163,9 @@ class App:
         self.debug_hitbox = False
         self.create_coffres()
 
+    # Crée un mob du type demandé dans la zone donnée, à une position aléatoire sans obstacle.
+    # La double boucle de vérification teste plusieurs points autour du centre pour éviter
+    # de spawner un mob à cheval sur un mur.
     def create_mobs(self, monstre, zone=None):
         temp = []
         loot_tables = {
@@ -202,8 +214,9 @@ class App:
             "tortue":{"health": 80, "damage": 40, "height": 32, "width": 32, "color": 11, "xp_drop_range": (25,35), "loot_table": loot_tables["tortue"],'texture':(96,128)}
             }
         if zone is not None:
-            #trouve des coordonée x et y aléatoires dans la zone qui ne sont pas des obstacles mais qui prend en compte les hitbox des mobs
-            
+            # Cherche en boucle une position libre dans la zone : on tire des coordonnées aléatoires,
+            # puis on vérifie un échantillon de points autour du centre du mob (pas de 4 pixels)
+            # pour s'assurer qu'aucun ne tombe sur une tuile obstacle.
             while True:
                 x = random.randint(zone.x, zone.x + zone.width)
                 y = random.randint(zone.y, zone.y + zone.height)
@@ -221,6 +234,9 @@ class App:
         else:
             x, y = pyxel.rndi(0, self.width), pyxel.rndi(0, self.height)
         self.mobs.append(Mob(type[monstre]["health"], type[monstre]["damage"], monstre, x, y, type[monstre]["width"], type[monstre]["height"], type[monstre]["color"], type[monstre]["xp_drop_range"], type[monstre]["loot_table"], type[monstre]["texture"], zone.name))
+
+    # Place un coffre à une position aléatoire valide dans chaque zone, en vérifiant
+    # qu'aucun point de sa hitbox ne tombe sur un obstacle. Même logique que create_mobs.
     def create_coffres(self):
         for zone in self.zones:
             for c in range(2):
@@ -238,12 +254,18 @@ class App:
                     if not collision:
                         break
                 self.coffres.append(Coffre(len(self.coffres)+1, f"Coffre {len(self.coffres)+1}", x, y, 32, 32, zone.difficulty))
+
+    # Vérifie que chaque zone a bien son quota de mobs vivants. Si ce n'est pas le cas,
+    # en crée de nouveaux jusqu'à atteindre max_mob.
     def check_mobs(self):
         for zone in self.zones:
             while len([mob for mob in self.mobs if mob.spawn_zone == zone.name]) < zone.max_mob:
                 monstre = random.choice(zone.monstre)
                 self.create_mobs(monstre, zone)
                 zone.timer_respawn = zone.respawn_time
+
+    # Crée un projectile tiré par le joueur en direction de la souris.
+    # Calcule la direction normalisée (vecteur de longueur 1) et la rotation visuelle de la flèche.
     def add_player_projectile(self, type, subtype):
         a={"arrow":{"basic":(8,5)}}
         self.orient_player_to_mouse()
@@ -255,6 +277,9 @@ class App:
         rotation = pyxel.atan2(yr, xr) - pyxel.atan2(-1, 1)
         self.projectiles.append(Arrow(self.player_x_abs, self.player_y_abs - self.player.height//4, a[type][subtype][1], rotation, (xr/hr, yr/hr), a[type][subtype][0], subtype))
 
+    # Boucle de logique principale appelée à chaque frame par Pyxel.
+    # Gère les trois états du jeu (menu, mort, jeu), les timers, les cooldowns
+    # et les appels aux systèmes de déplacement et d'armes.
     def update(self):
         self.player.level_up(self)
         if self.timestop:
@@ -275,6 +300,9 @@ class App:
             if pyxel.btnp(pyxel.KEY_H):
                 self.debug_hitbox = not self.debug_hitbox
             self.player.check_key(self)
+
+            # Bloc exécuté toutes les 6 frames : vérification des mobs, timers flottants
+            # (timestop, cooldowns, i_frames) décrémentés par pas de 0.1s.
             if pyxel.frame_count % 6 == 0:
                 self.check_mobs()
                 for zone in self.zones:
@@ -312,11 +340,13 @@ class App:
             if self.inventory.items["arme"]:
                 self.inventory.items["arme"].etat_arme(True, self)
             
+            # En timestop, le joueur se déplace librement sur l'écran figé.
+            # Hors timestop, c'est la caméra (world.deplace) qui suit le joueur normalement.
             if self.timestop == False:
                 self.world.deplace(self, self.player.speed)
             else:
                 self.player.deplace(self)
-                # Keep player on screen during timestop
+                # Limite la position du joueur à l'intérieur de l'écran visible pendant le timestop.
                 hw = self.player.width // 2
                 hh = self.player.height // 2
                 self.player_x_abs = max(self.x_center - self.width//2 + hw, min(self.player_x_abs, self.x_center + self.width//2 - hw))
@@ -325,6 +355,8 @@ class App:
                     self.timestop = False
                     self.recentrer = True
             
+    # Boucle de rendu appelée à chaque frame. Gère les trois états visuels :
+    # menu d'accueil, écran de mort, et jeu en cours (carte, entités, HUD, inventaire).
     def draw(self):
         if self.on_menu:
             pyxel.cls(0)
@@ -347,6 +379,8 @@ class App:
             self.place_projectiles()
             self.draw_hud()
             self.player.show_dmg(self)
+            # On change la palette après le dessin du joueur pour que l'effet timestop
+            # s'applique à partir de la prochaine frame sans décalage visuel.
             if self.timestop:
                 pyxel.colors[:] = self.palette_timestop
             else:
@@ -358,11 +392,14 @@ class App:
             if self.debug_hitbox:
                 self.draw_debug_hitboxes()
 
+    # Dessine et déplace tous les mobs de la liste à chaque frame.
     def place_mobs(self):
         for i in self.mobs:
             i.draw(self)
             i.move(self, self.player_x_abs, self.player_y_abs)
     
+    # Dessine et déplace tous les projectiles. Vérifie également la collision avec chaque mob :
+    # si touché, applique dégâts + knockback et supprime le projectile.
     def place_projectiles(self):
         for i in self.projectiles:
             i.draw(self)
@@ -378,6 +415,7 @@ class App:
                         self.projectiles.remove(i)
                     break
 
+    # Oriente le sprite du joueur vers la souris selon l'axe dominant (horizontal ou vertical).
     def orient_player_to_mouse(self):
         player_center_x = self.screen_center_x + (self.player_x_abs - self.x_center)
         player_center_y = self.screen_center_y + (self.player_y_abs - self.y_center)
@@ -388,6 +426,8 @@ class App:
         else:
             self.player.direction = "down" if dy >= 0 else "up"
 
+    # Calcule et renvoie les deux rectangles de collision de l'attaque mêlée :
+    # la hitbox du joueur lui-même, et la zone de slash projetée devant lui selon sa direction.
     def get_melee_hitboxes(self):
         slash_range = self.SLASH_RANGE//1.5
         player_box = (
@@ -396,7 +436,7 @@ class App:
             self.player.width,
             self.player.height,
         )
-        # Même rectangle carre pour toutes directions, centre devant le joueur
+        # Même rectangle carré pour toutes directions, centré devant le joueur
         if self.player.direction == 'up':
             slash_box = (player_box[0] + (player_box[2] - slash_range) // 2, player_box[1] - slash_range, slash_range, slash_range)
         elif self.player.direction == 'down':
@@ -407,6 +447,8 @@ class App:
             slash_box = (player_box[0] + player_box[2], player_box[1] + (player_box[3] - slash_range) // 2, slash_range, slash_range)
         return player_box, slash_box
 
+    # Déclenche l'attaque mêlée : vérifie pour chaque mob s'il est touché par la zone de slash
+    # ou par contact direct avec le joueur, puis applique dégâts et knockback.
     def player_slash(self):
         player_box, slash_box = self.get_melee_hitboxes()
         for j in self.mobs:
@@ -425,6 +467,8 @@ class App:
                 j.appliquer_knockback(self, self.player_x_abs, self.player_y_abs, force=self.MELEE_KNOCKBACK_FORCE)
                 j.is_dead(self) 
 
+    # Affiche les hitboxes de debug en mode H : contours rouges pour les mobs,
+    # vert pour le joueur, jaune pour la zone de slash.
     def draw_debug_hitboxes(self):
         for mob in self.mobs:
             mx = int(self.screen_center_x + (mob.x - self.x_center) - mob.width // 2)
@@ -440,6 +484,8 @@ class App:
         sy = int(self.screen_center_y + (slash_box[1] - self.y_center))
         pyxel.rectb(sx, sy, int(slash_box[2]), int(slash_box[3]), 10)
 
+    # Parcourt les tuiles visibles à l'écran et reconstruit la liste des obstacles
+    # (tuiles collisionnables) à chaque frame. Indispensable car la caméra se déplace.
     def load_walls(self):
         self.obstacle = []
         
@@ -449,6 +495,9 @@ class App:
                 if pyxel.tilemaps[self.world.tm].pget(x // 8, y // 8) in self.elt_col:
                     self.obstacle.append((x//8, y//8))
 
+    # Calcule les dégâts d'une attaque en tenant compte de l'arme équipée et,
+    # optionnellement, des bonus de la flèche. Tire aléatoirement un coup critique.
+    # Renvoie les dégâts finaux (float).
     def calcul_degats(self, item, arrow = None):
         base_damage = self.player.base_damage + item.liste_attributs.get("damage", 0)
         crit_chance_bonus = item.liste_attributs.get("crit_chance_bonus", 0)
@@ -464,6 +513,7 @@ class App:
         else:
             return base_damage
     
+    # Affiche le HUD en haut à gauche : PV, état du timestop, XP, niveau et position absolue.
     def draw_hud(self):
         pyxel.text(10,10,f"Health :{self.player.health}", 7)
         if self.timestop_cooldown>0:
@@ -476,14 +526,20 @@ class App:
         pyxel.text(10,40,f"Level: {self.player.level}", 7)
         pyxel.text(10, 50, f"x : {self.player_x_abs} y: {self.player_y_abs}", 7)
     
+    # Appelle la méthode draw de chaque coffre présent dans le monde.
     def draw_coffres(self):
         for i in self.coffres:
             i.draw(self)
+
+    # Passe l'état du jeu de "menu" à "en jeu" et applique la palette normale.
     def start_game(self):
         self.on_menu = False
         if not self.game_started:
             self.game_started = False
         pyxel.colors[:] = self.palette_normal
+
+    # Sérialise l'état du jeu (joueur, inventaire, mobs, coffres) dans un fichier JSON.
+    # La correspondance item -> ID se fait en cherchant le nom dans self.items.
     def save_game(self):
         print("Saving game...")
         data = {
@@ -515,8 +571,10 @@ class App:
         save_path = os.path.join(os.path.dirname(__file__), 'savegame.json')
         with open(save_path, 'w') as f:
             json.dump(data, f)
+
+    # Construit et renvoie un objet Item à partir de son ID dans self.items.
+    # Instancie la bonne sous-classe (sword, bow, Armor, Potion) selon le type stocké.
     def build_item(self, item_id):
-        """Construit un objet Item à partir d'un item_id dans self.items."""
         if item_id not in self.items:
             return None
         from data.items import sword, bow, Armor, Potion
@@ -533,6 +591,8 @@ class App:
             return Potion(item_data[1], item_data[2], item_data[3], item_data[4], item_data[5], item_data[6], item_data[7])
         return None
 
+    # Charge une sauvegarde JSON si elle existe. Restaure la position, les stats du joueur,
+    # l'inventaire (par ID d'item) et l'état des coffres. En cas d'erreur, démarre normalement.
     def load_game(self):
         try:
             save_path = os.path.join(os.path.dirname(__file__), 'savegame.json')
@@ -550,6 +610,8 @@ class App:
             self.player.base_critical_chance = data["player"]["base_critical_chance"]
             self.player.base_critical_multiplier = data["player"]["base_critical_multiplier"]
             
+            # Les clés des slots d'inventaire sont sauvegardées en string dans le JSON,
+            # on les reconvertit en int pour les slots numériques avant de réassigner les items.
             for slot, item_id in data["inventory"]["items"].items():
                 if str(slot).isdigit():
                     slot = int(slot)
