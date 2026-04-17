@@ -1,4 +1,6 @@
 class Zone:
+    # Représente une zone de la carte avec ses propres ennemis, sa difficulté et ses limites spatiales.
+    # Utilisée pour contrôler le spawn (apparition) des mobs par secteur.
     def __init__(self, name, monstre, difficulty, max_mob, x, y, width, height):
         self.name = name
         self.monstre = monstre
