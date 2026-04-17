@@ -36,6 +36,6 @@ class Coffre:
         screen_x = app.screen_center_x + (self.x - app.x_center)
         screen_y = app.screen_center_y + (self.y - app.y_center)
         if not self.ouvert:
-            pyxel.rect(screen_x, screen_y, self.width, self.height, 8)
+            pyxel.blt(screen_x, screen_y, 1, 0, 224, self.width, self.height, colkey=12)
         else:
-            pyxel.rect(screen_x, screen_y, self.width, self.height, 7)
+            pyxel.blt(screen_x, screen_y-4, 1, 32, 192, self.width, self.height+4, colkey=12)

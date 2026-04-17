@@ -150,7 +150,7 @@ class Mob:
             app.player.experience += xp_drop
             print(app.player.experience)
             for item in self.loot_table:
-                if pyxel.rndf() < item["drop_chance"]:
+                if pyxel.rndf(0, 1) < item["drop_chance"]:
                     app.inventory.add_item(item["item"])
             app.mobs.remove(self)
 

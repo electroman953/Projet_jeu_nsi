@@ -238,17 +238,6 @@ class App:
                     if not collision:
                         break
                 self.coffres.append(Coffre(len(self.coffres)+1, f"Coffre {len(self.coffres)+1}", x, y, 32, 32, zone.difficulty))
-
-    def check_potions(self):
-        if pyxel.frame_count % 60 == 0:
-            for potion in self.potion_active[:]:
-                if "heal" in potion["effect"]:
-                    self.player.regen(self, potion["value"])
-                potion["duration"] -= 1
-                if potion["duration"] <= 0:
-                    self.potion_active.remove(potion)
-            self.player.speed_bonus = sum(p["value"] for p in self.potion_active if "speed" in p["effect"])
-            self.player.speed = self.player.base_speed + self.player.speed_bonus
     def check_mobs(self):
         for zone in self.zones:
             while len([mob for mob in self.mobs if mob.spawn_zone == zone.name]) < zone.max_mob:
@@ -303,7 +292,7 @@ class App:
                     self.sword_cooldown = max(0, round(self.sword_cooldown - 0.1, 1))
                 if self.i_frames > 0:
                     self.i_frames = max(0, round(self.i_frames - 0.1, 1))
-            self.check_potions()
+
             if pyxel.frame_count % 30 == 0:
                 for i in self.projectiles:
                     i.supprimer(self)
