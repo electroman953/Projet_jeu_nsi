@@ -132,8 +132,7 @@ class App:
             34: ("potion", "Potion de soin supreme",  "Regenere 20 PV par seconde pendant 10 secondes.", 128, 96, {"heal": True}, 20, 10),
         }
 
-
-
+        
         # Coordonnees de spawn modifiables
         self.spawn_x = 8 * 38
         self.spawn_y = 9 * 41
@@ -158,12 +157,50 @@ class App:
 
     def create_mobs(self, monstre, zone=None):
         temp = []
+        loot_tables = {
+            "tortue": [
+                {"drop_chance": 0.08, "item": self.build_item(31)},
+                {"drop_chance": 0.03, "item": self.build_item(18)},
+                {"drop_chance": 0.02, "item": self.build_item(17)},
+            ],
+            "renard": [
+                {"drop_chance": 0.07, "item": self.build_item(31)},
+                {"drop_chance": 0.04, "item": self.build_item(32)},
+                {"drop_chance": 0.03, "item": self.build_item(2)},
+                {"drop_chance": 0.02, "item": self.build_item(15)},
+                {"drop_chance": 0.01, "item": self.build_item(20)},
+            ],
+            "chien": [
+                {"drop_chance": 0.06, "item": self.build_item(32)},
+                {"drop_chance": 0.04, "item": self.build_item(4)},
+                {"drop_chance": 0.04, "item": self.build_item(12)},
+                {"drop_chance": 0.02, "item": self.build_item(22)},
+                {"drop_chance": 0.01, "item": self.build_item(5)},
+            ],
+            "lion": [
+                {"drop_chance": 0.08, "item": self.build_item(33)},
+                {"drop_chance": 0.04, "item": self.build_item(6)},
+                {"drop_chance": 0.04, "item": self.build_item(14)},
+                {"drop_chance": 0.03, "item": self.build_item(26)},
+                {"drop_chance": 0.02, "item": self.build_item(8)},
+                {"drop_chance": 0.01, "item": self.build_item(19)},
+            ],
+            "salamandre": [
+                {"drop_chance": 0.10, "item": self.build_item(34)},
+                {"drop_chance": 0.05, "item": self.build_item(8)},
+                {"drop_chance": 0.05, "item": self.build_item(21)},
+                {"drop_chance": 0.03, "item": self.build_item(30)},
+                {"drop_chance": 0.03, "item": self.build_item(29)},
+                {"drop_chance": 0.02, "item": self.build_item(23)},
+            ],
+        }
+
         type={
-            "chien": {"health": 50, "damage": 20, "height": 32, "width": 32, "color": 8, "xp_drop_range": (5, 15), "loot_table": [], 'texture':(0,0)},
-            "lion":{"health": 200, "damage": 100, "height": 32, "width": 32, "color": 7, "xp_drop_range": (50,60), "loot_table": [],'texture':(0,125)},
-            "renard":{"health": 100, "damage": 50, "height": 32, "width": 32, "color": 9, "xp_drop_range": (10, 20), "loot_table": [],'texture':(96,0)},
-            "salamandre":{"health": 550, "damage": 150, "height": 32, "width": 32, "color": 10, "xp_drop_range": (100,150), "loot_table": [],'texture':(192,0)},
-            "tortue":{"health": 80, "damage": 40, "height": 32, "width": 32, "color": 11, "xp_drop_range": (25,35), "loot_table": [],'texture':(96,128)}
+            "chien": {"health": 50, "damage": 20, "height": 32, "width": 32, "color": 8, "xp_drop_range": (5, 15), "loot_table":loot_tables["chien"], 'texture':(0,0)},
+            "lion":{"health": 200, "damage": 100, "height": 32, "width": 32, "color": 7, "xp_drop_range": (50,60), "loot_table": loot_tables["lion"],'texture':(0,125)},
+            "renard":{"health": 100, "damage": 50, "height": 32, "width": 32, "color": 9, "xp_drop_range": (10, 20), "loot_table": loot_tables["renard"],'texture':(96,0)},
+            "salamandre":{"health": 550, "damage": 150, "height": 32, "width": 32, "color": 10, "xp_drop_range": (100,150), "loot_table": loot_tables["salamandre"],'texture':(192,0)},
+            "tortue":{"health": 80, "damage": 40, "height": 32, "width": 32, "color": 11, "xp_drop_range": (25,35), "loot_table": loot_tables["tortue"],'texture':(96,128)}
             }
         if zone is not None:
             #trouve des coordonée x et y aléatoires dans la zone qui ne sont pas des obstacles mais qui prend en compte les hitbox des mobs
@@ -237,7 +274,7 @@ class App:
                 for zone in self.zones:
                     if zone.timer_respawn > 0:
                         zone.timer_respawn = max(0, round(zone.timer_respawn - 0.1, 1))
-                for i in self.mobs:
+                for i in self.mobs[:]:
                     i.is_dead(self)
                 if self.timestop_timer > 0:
                     self.timestop_timer = max(0, round(self.timestop_timer - 0.1, 1))
@@ -463,6 +500,10 @@ class App:
             "mobs": [
                 {"x": mob.x, "y": mob.y, "health": mob.health}
                 for mob in self.mobs if mob.health > 0
+            ],
+            "coffres": [
+                {"id": c.id, "ouvert": c.ouvert, "contenu": c.contenu}
+                for c in self.coffres
             ]
         }
         save_path = os.path.join(os.path.dirname(__file__), 'savegame.json')
@@ -514,5 +555,12 @@ class App:
                         self.inventory.items[slot] = None
                 else:
                     self.inventory.items[slot] = None
+            if "coffres" in data:
+                for saved in data["coffres"]:
+                    for c in self.coffres:
+                        if c.id == saved["id"]:
+                            c.ouvert = saved["ouvert"]
+                            c.contenu = saved["contenu"]
+                            break
         except (FileNotFoundError, KeyError, json.JSONDecodeError):
             pass
