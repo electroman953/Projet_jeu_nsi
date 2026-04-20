@@ -163,7 +163,7 @@ class App:
         self.obstacle = []
         self.debug_hitbox = False
         self.boss_spawned = False
-        
+        self.create_coffres()
 
     # Crée un mob du type demandé dans la zone donnée, à une position aléatoire sans obstacle.
     # La double boucle de vérification teste plusieurs points autour du centre pour éviter
